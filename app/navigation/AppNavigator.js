@@ -1,6 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
 
 import AccountScreen from "../screens/AccountScreen";
 import ListingDetailsScreen from "../screens/ListingDetailsScreen";
@@ -29,14 +31,27 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
 const AppNavigator = () => {
   const [signedIn, setSignedIn] = useState(false);
 
+  // const registerForPushNotifications = async () => {
+  //   try {
+  //     const permission = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+  //     if (!permission.granted) return;
+
+  //     const token = await Notifications.getExpoPushTokenAsync();
+  //     console.log(token);
+  //   } catch (err) {
+  //     console.log("Error NOTIFICATION FOR TOKEN...", err);
+  //   }
+  // };
+
   useEffect(() => {
-    console.log("asdasdasdasdasdasdfas dasdasda");
+    console.log("App navigator USE EFFECT.....");
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setSignedIn(true);
       } else setSignedIn(false);
     });
-  });
+    // registerForPushNotifications();
+  }, []);
 
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>

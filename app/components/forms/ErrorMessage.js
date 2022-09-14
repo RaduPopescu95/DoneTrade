@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 import Text from "../Text";
 
 function ErrorMessage({ error, visible }) {
-  if (!visible || !error) return null;
+  // if (!visible || !error) return null;
 
   return <Text style={styles.error}>{error}</Text>;
 }
