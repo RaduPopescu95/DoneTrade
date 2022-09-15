@@ -133,10 +133,8 @@ function ListingDetailsScreen({ route }) {
       <Image style={styles.image} source={{ uri: listing.img_uri }} />
 
       <View style={styles.detailsContainer}>
-        <View>
-          <Text style={styles.title}>{listing.title}</Text>
-          <Text style={styles.price}>{listing.price}</Text>
-        </View>
+        <Text style={styles.title}>{listing.title}</Text>
+        <Text style={styles.price}>{listing.price}</Text>
       </View>
       <View style={styles.detailsContainer2}>
         <View style={styles.userContainer}>
@@ -156,12 +154,14 @@ function ListingDetailsScreen({ route }) {
             transform: [{ translateX: saveButtonTranslationX }],
           }}
         >
-          {/* <Text>Save</Text> */}
-          <ContactSellerForm listing={listing} />
+          <ContactSellerForm
+            listing={listing}
+            toUser={email}
+            toUserName={firstName + " " + lastName}
+          />
         </Animated.View>
         {!isPresentUser && (
           <TouchableOpacity style={styles.button} onPress={() => showContact()}>
-            {/* <Text style={styles.text}>C</Text> */}
             <MaterialCommunityIcons
               name="message"
               color={colors.light}
@@ -208,10 +208,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   detailsContainer: {
-    backgroundColor: colors.light,
+    // backgroundColor: colors.light,
     paddingLeft: 20,
     display: "flex",
-    flexDirection: "row",
+    // flexDirection: "row",
   },
   detailsContainer2: {
     paddingBottom: 20,
