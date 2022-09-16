@@ -47,7 +47,7 @@ function MessagesScreen(props) {
 
   const handleDelete = (message) => {
     // Delete the message from messages
-    setMessages(messages.filter((m) => m.id !== message.id));
+    // setMessages(messages.filter((m) => m.id !== message.id));
   };
 
   const retrieveData = async () => {
@@ -162,17 +162,17 @@ function MessagesScreen(props) {
         }
         ItemSeparatorComponent={ListItemSeparator}
         refreshing={refreshing}
-        onRefresh={() => {
-          //CREATE DELETE FROM UI AND DATABASE AND SHOW ALERT DO YOU WANT TO DELETE AND EXPLAIN THAT THE MESSAGE WILL NOT BE DELETED FOR THE OTHER PERSON
-          setMessages([
-            {
-              id: 2,
-              title: "T2",
-              description: "D2",
-              image: require("../assets/mosh.jpg"),
-            },
-          ]);
-        }}
+        // onRefresh={() => {
+        //   //CREATE DELETE FROM UI AND DATABASE AND SHOW ALERT DO YOU WANT TO DELETE AND EXPLAIN THAT THE MESSAGE WILL NOT BE DELETED FOR THE OTHER PERSON
+        //   setMessages([
+        //     {
+        //       id: 2,
+        //       title: "T2",
+        //       description: "D2",
+        //       image: require("../assets/mosh.jpg"),
+        //     },
+        //   ]);
+        // }}
       />
     </Screen>
   );
