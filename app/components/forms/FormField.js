@@ -4,7 +4,13 @@ import { useFormikContext } from "formik";
 import TextInput from "../TextInput";
 import ErrorMessage from "./ErrorMessage";
 
-function AppFormField({ name, width, bgColorContactSeller, ...otherProps }) {
+function AppFormField({
+  name,
+  width,
+  bgColorContactSeller,
+  defaultValue,
+  ...otherProps
+}) {
   const { setFieldTouched, handleChange, errors, touched } = useFormikContext();
 
   return (
@@ -14,6 +20,7 @@ function AppFormField({ name, width, bgColorContactSeller, ...otherProps }) {
         onChangeText={handleChange(name)}
         width={width}
         bgColorContactSeller={bgColorContactSeller}
+        defaultValue={defaultValue}
         {...otherProps}
       />
       <ErrorMessage error={errors[name]} visible={touched[name]} />

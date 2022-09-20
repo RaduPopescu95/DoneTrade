@@ -31,22 +31,24 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 15,
     backgroundColor: colors.white,
-    marginBottom: 20,
+    marginBottom: 10,
     overflow: "hidden",
+    width: "48%",
+    margin: 5,
   },
   detailsContainer: {
-    padding: 20,
+    padding: 10,
   },
   image: {
     width: "100%",
-    height: 200,
+    height: 100,
   },
   subTitle: {
     color: colors.secondary,
     fontWeight: "bold",
   },
   title: {
-    marginBottom: 7,
+    marginBottom: 4,
   },
 });
 

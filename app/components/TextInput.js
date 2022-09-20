@@ -8,6 +8,7 @@ function AppTextInput({
   icon,
   width = "100%",
   bgColorContactSeller,
+  defaultValue,
   ...otherProps
 }) {
   return (
@@ -22,6 +23,7 @@ function AppTextInput({
       )}
       <TextInput
         placeholderTextColor={defaultStyles.colors.medium}
+        defaultValue={defaultValue}
         // style={defaultStyles.text}
         style={[defaultStyles.text, { backgroundColor: bgColorContactSeller }]}
         {...otherProps}

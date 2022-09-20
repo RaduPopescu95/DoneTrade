@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { View, StyleSheet, Image, TouchableHighlight } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/Swipeable";

@@ -156,8 +156,8 @@ function ListingEditScreen() {
     // setUploadVisible(false);
   };
 
-  const handleAddItem = async (values, file) => {
-    console.log("ADD ITEM");
+  const handleAddItem = async (values, { resetForm }, file) => {
+    console.log("ADD ITEM..", values);
     const unsub = query(
       collection(db, "Users"),
       where("owner_uid", "==", userId)
@@ -189,6 +189,7 @@ function ListingEditScreen() {
       });
       uploadImage(values.images[0]);
       // alert("Success");
+      resetForm();
     } catch (err) {
       // alert("Could not save the listing", err);
     }
@@ -219,6 +220,7 @@ function ListingEditScreen() {
           name="price"
           placeholder="Price"
           width={120}
+          defaultValue={0}
         />
         <Picker
           items={categories}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Button, Alert } from "react-native";
+import { StyleSheet, Button, Alert, TextInput, ScrollView } from "react-native";
 import * as Yup from "yup";
 import { authentication, db, storage } from "../../firebase";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
@@ -10,6 +10,7 @@ import Screen from "../components/Screen";
 import { Form, FormField, SubmitButton } from "../components/forms";
 import colors from "../config/colors";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "expo-constants";
 import ProfilePictPicker from "../components/forms/ProfilePictPicker";
 import UploadScreen from "./UploadScreen";
 
@@ -21,6 +22,10 @@ const validationSchema = Yup.object().shape({
     .required("Last name is a required field")
     .label("LastName"),
   email: Yup.string().required().email().label("Email"),
+  phoneNumber: Yup.number()
+    .typeError("Phone number must contain only numbers!")
+    .required("You need to enter a phone number")
+    .label("PhoneNumber"),
   password: Yup.string().required().min(4).label("Password"),
   email: Yup.string().email().required("Please Enter your Email"),
   confirmPassword: Yup.string()
@@ -76,7 +81,7 @@ function RegisterScreen() {
             owner_uid: user.uid,
             firstName: values.firstName,
             lastName: values.lastName,
-            // pass: values.password,
+            phoneNumber: values.phoneNumber,
             email: user.email,
             // profilePicture: getRandomProfilePicture(),
           };
@@ -132,7 +137,7 @@ function RegisterScreen() {
     console.log("registerUseEffect.....");
   }, []);
   return (
-    <Screen style={styles.container}>
+    <ScrollView style={styles.container}>
       <UploadScreen visible={uploadVisible} />
       <Form
         initialValues={{
@@ -170,6 +175,15 @@ function RegisterScreen() {
         <FormField
           autoCapitalize="none"
           autoCorrect={false}
+          icon="email"
+          keyboardType="number"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          textContentType="emailAddress"
+        />
+        <FormField
+          autoCapitalize="none"
+          autoCorrect={false}
           icon="lock"
           name="password"
           placeholder="Password"
@@ -191,17 +205,16 @@ function RegisterScreen() {
           onPress={() => navigation.navigate("LoginScreen")}
         />
       </Form>
-    </Screen>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // justifyContent: "center",
-    // alignItems: "center",
-    // display: "flex",
     padding: 10,
     backgroundColor: colors.light,
+    flex: 1,
+    paddingTop: Constants.statusBarHeight,
   },
 });
 

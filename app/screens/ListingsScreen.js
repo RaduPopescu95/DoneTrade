@@ -7,6 +7,7 @@ import {
   View,
   Image,
 } from "react-native";
+import Constants from "expo-constants";
 import { authentication, db, storage } from "../../firebase";
 // import { collection, query, where } from "firebase/firestore";
 import {
@@ -27,6 +28,9 @@ import { useState } from "react/cjs/react.development";
 import LinkList from "react-native/Libraries/NewAppScreen/components/LearnMoreLinks";
 import Loader from "../components/Loader";
 import { ref, getDownloadURL, listAll, child } from "firebase/storage";
+import SearchBox from "../components/SearchBox";
+import OtherUserListings from "../components/OtherUserListings";
+import Category from "../components/Category";
 // import { onSnapshot } from "firebase/firestore";
 
 const listingss = [
@@ -137,39 +141,108 @@ function ListingsScreen({ navigation }) {
   }, []);
 
   return (
-    <Screen style={styles.screen}>
-      <Loader visible={loading} />
-
-      {/* <ActivityIndicator animating={loading} size="large" /> */}
-      {/* <Loader visible={loading} /> */}
-      <FlatList
-        data={listings}
-        keyExtractor={(listing) => listing.key.toString()}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <Card
-            title={item.title}
-            subTitle={"$" + item.price}
-            image={{ uri: item.img_uri }}
-            // image={require("../assets/chair.jpg")}
-            onPress={() => navigation.navigate("ListingDetails", item)}
+    <>
+      <View style={styles.searchContainer}>
+        <SearchBox />
+        <View style={styles.card}>
+          <View style={styles.cardContent}>
+            <Text style={styles.cardDescription}>Categories</Text>
+          </View>
+          <View
+            style={{
+              borderBottomColor: "black",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
           />
-        )}
-        refreshing={refreshing}
-        onRefresh={() => {
-          setRefreshing(true);
-          retrieveData();
-          setLoading(false);
-        }}
-      />
-    </Screen>
+          <OtherUserListings />
+        </View>
+      </View>
+      <Screen style={styles.screen}>
+        {/* <Category /> */}
+        <Loader visible={loading} />
+
+        {/* <ActivityIndicator animating={loading} size="large" /> */}
+        {/* <Loader visible={loading} /> */}
+        <FlatList
+          data={listings}
+          keyExtractor={(listing) => listing.key.toString()}
+          showsVerticalScrollIndicator={false}
+          style={styles.listingsStyle}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <Card
+              title={item.title}
+              subTitle={"$" + item.price}
+              image={{ uri: item.img_uri }}
+              // image={require("../assets/chair.jpg")}
+              onPress={() => navigation.navigate("ListingDetails", item)}
+            />
+          )}
+          refreshing={refreshing}
+          onRefresh={() => {
+            setRefreshing(true);
+            retrieveData();
+            setLoading(false);
+          }}
+        />
+      </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  listingsStyle: {
+    // flex: 1,
+    // flexDirection: "row",
+    // margin: 0,
+  },
+  card: {
+    // shadowColor: colors.dark,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 10.49,
+    elevation: 4,
+    width: "100%",
+    marginVertical: 2,
+    backgroundColor: "white",
+    marginHorizontal: 0,
+  },
+  cardContent: {
+    paddingVertical: 12.5,
+    paddingHorizontal: 16,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 12.5,
+    paddingBottom: 0,
+
+    paddingHorizontal: 16,
+    borderBottomLeftRadius: 1,
+    borderBottomRightRadius: 1,
+  },
+  cardTitle: {
+    color: colors.dark,
+    fontSize: 20,
+  },
+  cardDescription: {
+    fontSize: 18,
+    color: colors.dark,
+  },
   screen: {
-    padding: 10,
+    padding: 5,
     backgroundColor: colors.light,
+    paddingTop: 5,
+  },
+  searchContainer: {
+    // flex: 1,
+    // justifyContent: "center",
+    marginTop: 7,
+    backgroundColor: colors.light,
+    paddingTop: Constants.statusBarHeight,
   },
   imgTest: {
     width: 200,
