@@ -46,6 +46,7 @@ function ListingDetailsScreen({ route }) {
   const [contact, setContacted] = useState(false);
   const [isPresentUser, setIsPresentUser] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [usersListings, setUserListings] = useState([]);
   const [value] = useState(new Animated.Value(0));
   const auth = authentication;
   const userNow = {};
@@ -54,13 +55,13 @@ function ListingDetailsScreen({ route }) {
 
   const retrieveData = async () => {
     // GOOD FOR RETRIEVE ONE DOC
-    console.log("test1");
-    console.log(listing.user);
+    // console.log("test1");
+    // console.log(listing.user);
     const docRef = doc(db, "Users", listing.user);
     // console.log("DOCREF...", docRef);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log("Document data:....", docSnap.data());
+      // console.log("Document data:....", docSnap.data());
       setFirstName(docSnap.data().firstName);
       setLastName(docSnap.data().lastName);
       setEmail(docSnap.data().email);
@@ -84,7 +85,7 @@ function ListingDetailsScreen({ route }) {
     // }
     // console.log("Retreving Profile Pict---------------------------");
     if (auth.currentUser.email === listing.user) {
-      console.log("present user...", listing.user);
+      // console.log("present user...", listing.user);
       setIsPresentUser(true);
     }
     const reference = ref(
@@ -94,9 +95,59 @@ function ListingDetailsScreen({ route }) {
     await getDownloadURL(reference).then((x) => {
       setProfilePicture(x);
     });
+
     // setLoading(false);
     // setRefreshing(false);
     // setListings(usersPosts);
+    console.log(
+      "Retreving data Listings For the user---------------------------"
+    );
+    // setLoading(true);
+    const usersPosts = [];
+    // const usersEmailImgName = [];
+    const posts = query(collectionGroup(db, "Posts"));
+    const querySnapshot = await getDocs(posts);
+    // console.log("query...", querySnapshot);
+    querySnapshot.forEach((doc) => {
+      // console.log("doc.data...", doc.data().user);
+      // console.log(usersPosts.length);
+      if (listing.user === doc.data().user) {
+        // console.log("test here...", doc.data().user);
+        usersPosts.push({ ...doc.data(), key: doc.id });
+      }
+      // console.log("length of usersposts...", usersPosts.length);
+    });
+    // console.log("usersposts...", usersPosts);
+    // console.log("all users posts...", usersPosts);
+    console.log("start 1 FOR SETTINGS USERS POSTS");
+    // const newListings = [...usersListings];
+
+    for (let i = 0; i < usersPosts.length; i++) {
+      // console.log(usersPosts[i]);
+      // console.log("loops for settings users posts...", usersPosts[i].user);
+      // console.log("loops for settings users posts1...", usersPosts[i]);
+      // console.log("loops for settings users posts2...", usersPosts[i].img_name);
+      // console.log(usersPosts[i].img_name);
+      const reference = ref(
+        storage,
+        `images/${usersPosts[i].user}/posts/${usersPosts[i].img_name}`
+      );
+      await getDownloadURL(reference).then((x) => {
+        // console.log(usersPosts[i]);
+        // console.log("xxx....", x);
+        usersPosts[i].img_uri = x;
+        // setUrl(x);
+        // newListings.forEach((element) => {
+        //   element.img_uri = x;
+        // });
+      });
+      // usersEmailImgName.push({
+      //   email: usersPosts[i].user,
+      //   post_img: usersPosts[i].img_name,
+      // });
+    }
+    console.log("final users...posts.1..", usersPosts);
+    setUserListings(usersPosts);
   };
 
   const opacity = useRef(new Animated.Value(0)).current;
@@ -136,8 +187,9 @@ function ListingDetailsScreen({ route }) {
     console.log(
       "USE EFFECTT FOR DETAIL LISTINGS................................."
     );
-    console.log(firstName, lastName, email);
-    console.log("EMAIL CURENT USER....", auth.currentUser.email);
+    console.log("useefect userslistings...", usersListings);
+    // console.log(firstName, lastName, email);
+    // console.log("EMAIL CURENT USER....", auth.currentUser.email);
     retrieveData();
   }, [isEditing]);
 
@@ -231,8 +283,14 @@ function ListingDetailsScreen({ route }) {
       <View style={styles.cardContent}>
         <Text style={styles.price}>Users listings</Text>
       </View>
-
-      <OtherUserListings />
+      {usersListings.length > 0 && (
+        <OtherUserListings
+          usersListings={usersListings}
+          focusedListing={listing}
+          // onPress={() => navigation.navigate("ListingDetails", item)}
+        />
+      )}
+      {/* <OtherUserListings /> */}
     </>
   );
 }

@@ -142,21 +142,7 @@ function ListingsScreen({ navigation }) {
 
   return (
     <>
-      <View style={styles.searchContainer}>
-        <SearchBox />
-        <View style={styles.card}>
-          <View style={styles.cardContent}>
-            <Text style={styles.cardDescription}>Categories</Text>
-          </View>
-          <View
-            style={{
-              borderBottomColor: "black",
-              borderBottomWidth: StyleSheet.hairlineWidth,
-            }}
-          />
-          <OtherUserListings />
-        </View>
-      </View>
+      <View style={styles.searchContainer}></View>
       <Screen style={styles.screen}>
         {/* <Category /> */}
         <Loader visible={loading} />
