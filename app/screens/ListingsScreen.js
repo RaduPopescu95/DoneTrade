@@ -67,6 +67,7 @@ function ListingsScreen({ navigation }) {
   const [url, setUrl] = useState();
   const [currentUserOnline, setCurrentUserOnline] = useState("");
   const auth = authentication;
+  const imageUri = "";
 
   const retrieveData = async () => {
     // GOOD FOR RETRIEVE ONE DOC
@@ -104,34 +105,42 @@ function ListingsScreen({ navigation }) {
       usersPosts.push({ ...doc.data(), key: doc.id });
       // console.log(usersPosts.length);
     });
-    console.log(usersPosts);
+    console.log("usersPosts...", usersPosts);
     console.log("start 1");
     const newListings = [...listings];
+    const img_uri = [];
 
     for (let i = 0; i < usersPosts.length; i++) {
-      // console.log(usersPosts[i]);
-      // console.log(usersPosts[i].user);
-      // console.log(usersPosts[i].img_name);
-      const reference = ref(
-        storage,
-        `images/${usersPosts[i].user}/posts/${usersPosts[i].img_name}`
-      );
-      await getDownloadURL(reference).then((x) => {
-        // console.log(usersPosts[i]);
-        // console.log(x);
-        usersPosts[i].img_uri = x;
-        // setUrl(x);
-        newListings.forEach((element) => {
-          element.img_uri = x;
+      for (let z = 0; z < usersPosts[i].img_names.length; z++) {
+        console.log("img names...", usersPosts[i].img_names[z]);
+        const reference = ref(
+          storage,
+          `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
+        );
+        await getDownloadURL(reference).then((x) => {
+          // console.log(usersPosts[i]);
+          console.log("xxx", x);
+          img_uri.push(x);
+
+          // setUrl(x);
+          // newListings.forEach((element) => {
+          //   element.img_uri = x;
+          // });
         });
-      });
+      }
+      usersPosts[i].img_uri = [...img_uri];
+      usersPosts[i].first_img_uri = img_uri[0];
+      console.log("firstimageuri...", usersPosts[i].first_img_uri);
       usersEmailImgName.push({
         email: usersPosts[i].user,
-        post_img: usersPosts[i].img_name,
+        post_img: usersPosts[i].img_names[0],
       });
     }
-    setListings(usersPosts);
     setLoading(false);
+    console.log("UsersPosts2...", usersPosts);
+    // console.log("imgs urisss...", usersPosts.img_uri[0]);
+    // imageUri = usersPosts.img_uri[0];
+    setListings(usersPosts);
     setRefreshing(false);
   };
 
@@ -156,10 +165,11 @@ function ListingsScreen({ navigation }) {
           style={styles.listingsStyle}
           numColumns={2}
           renderItem={({ item }) => (
+            // console.log(typeof item.img_uri[0], item.img_uri[0])
             <Card
               title={item.title}
               subTitle={"$" + item.price}
-              image={{ uri: item.img_uri }}
+              image={{ uri: item.first_img_uri }}
               // image={require("../assets/chair.jpg")}
               onPress={() => navigation.navigate("ListingDetails", item)}
             />

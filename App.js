@@ -20,6 +20,8 @@ import AppNavigator, { AppNavigatorUser } from "./app/navigation/AppNavigator";
 import LoginScreen from "./app/screens/LoginScreen";
 import RegisterScreen from "./app/screens/RegisterScreen";
 import WelcomeScreen from "./app/screens/WelcomeScreen";
+import UserListingsScreen from "./app/screens/UserListingsScreen";
+import UserListingDetails from "./app/screens/UserListingDetails";
 
 const Stack = createNativeStackNavigator();
 const StackNavigatorUser = () => (
@@ -52,6 +54,7 @@ export default function App() {
   return (
     <NavigationContainer theme={NavigationTheme}>
       <StackNavigatorUser />
+      {/* <UserListingDetails /> */}
       {/* <ChatScreen /> */}
       {/* <RegisterScreen /> */}
       {/* <AppNavigator /> */}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
+  ScrollView,
   View,
   Image,
   StyleSheet,
@@ -183,6 +184,38 @@ function ListingDetailsScreen({ route }) {
     inputRange: [0, 1],
     outputRange: [100, 0],
   });
+
+  const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+
+  const product = {
+    name: "Lorem ipsum dolor sit amet",
+    description:
+      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
+    created: "",
+    images: [
+      "https://bootdey.com/img/Content/avatar/avatar6.png",
+      "https://bootdey.com/img/Content/avatar/avatar2.png",
+      "https://bootdey.com/img/Content/avatar/avatar3.png",
+    ],
+    colors: ["#00BFFF", "#FF1493", "#00CED1", "#228B22", "#20B2AA", "#FF4500"],
+  };
+
+  const [firstImage, setFirstImage] = useState(listing.img_uri[0]);
+  const [secondImages, setSecondImages] = useState(listing.img_uri);
+  let result = [...listing.img_uri];
+  const handleChangeImages = (img) => {
+    // console.log("imgg...", img);
+    // console.log("second img...", secondImages);
+    // result = result.filter((i) => i !== img);
+    // console.log("second img...", secondImages);
+    setSecondImages(result.filter((i) => i !== img));
+    // console.log("second img2222...", secondImages);
+    setFirstImage(img);
+    // console.log("firstimages...", firstImage);
+
+    // console.log("result...", result);
+  };
+
   useEffect(() => {
     console.log(
       "USE EFFECTT FOR DETAIL LISTINGS................................."
@@ -193,35 +226,71 @@ function ListingDetailsScreen({ route }) {
     retrieveData();
   }, [isEditing]);
 
-  const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
-  return (
-    <>
-      <View
-        // behavior="position"
-        // keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 100}
-        style={styles.bigContainer}
-      >
-        <Image style={styles.image} source={{ uri: listing.img_uri }} />
+  const __renderImages = () => {
+    return (
+      <View style={styles.smallImagesContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            handleChangeImages(secondImages[0]);
+          }}
+        >
+          <Image style={styles.smallImage} source={{ uri: secondImages[0] }} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            handleChangeImages(secondImages[1]);
+          }}
+        >
+          <Image style={styles.smallImage} source={{ uri: secondImages[1] }} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            handleChangeImages(secondImages[2]);
+          }}
+        >
+          <Image style={styles.smallImage} source={{ uri: secondImages[2] }} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
-        {/* <View style={styles.detailsContainer}>
-        <Text style={styles.title}>{listing.title}</Text>
-        <Text style={styles.price}>${listing.price}</Text>
-        <Text style={styles.description}>{listing.description}</Text>
-      </View> */}
+  return (
+    <View style={styles.container}>
+      <ScrollView style={styles.content}>
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>{listing.title}</Text>
+            <Text style={styles.name}>{listing.title}</Text>
           </View>
           <View style={styles.cardContent}>
-            <Text style={styles.price}>{listing.price}</Text>
+            <View style={styles.header}>
+              <View style={styles.mainImageContainer}>
+                {/* <Image style={styles.mainImage} source={{ uri: mainImage }} /> */}
+                <Image style={styles.mainImage} source={{ uri: firstImage }} />
+              </View>
+              {__renderImages()}
+            </View>
           </View>
         </View>
+
         <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Price</Text>
+            <Text style={styles.price}>${listing.price}</Text>
+          </View>
+          {/* <View style={styles.cardContent}>{__renderColors()}</View> */}
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Description</Text>
+          </View>
           <View style={styles.cardContent}>
-            <Text style={styles.cardDescription}>{listing.description}</Text>
+            <Text style={styles.description}>{listing.description}</Text>
           </View>
         </View>
-        <View style={styles.detailsContainer2}>
+
+        <View style={styles.card}>
+          {/* <View style={styles.cardContent}> */}
           {/* ---------------------------------- */}
           <View style={styles.box}>
             <Image style={styles.img} source={{ uri: profilePicture }} />
@@ -256,104 +325,43 @@ function ListingDetailsScreen({ route }) {
               </View>
             </View>
           </View>
-
-          {/* <Animated.View
-          style={{
-            opacity: saveButtonOpacity,
-            transform: [{ translateX: saveButtonTranslationX }],
-          }}
-        >
-          <ContactSellerForm
-            listing={listing}
-            toUser={email}
-            toUserName={firstName + " " + lastName}
-          />
-        </Animated.View> */}
-
-          {/* <TouchableOpacity style={styles.button} onPress={() => showContact()}>
-            <MaterialCommunityIcons
-              name="message"
-              color={colors.light}
-              size={32}
-            />
-          </TouchableOpacity> */}
         </View>
-      </View>
-
-      <View style={styles.cardContent}>
-        <Text style={styles.price}>Users listings</Text>
-      </View>
-      {usersListings.length > 0 && (
-        <OtherUserListings
-          usersListings={usersListings}
-          focusedListing={listing}
-          // onPress={() => navigation.navigate("ListingDetails", item)}
-        />
-      )}
-      {/* <OtherUserListings /> */}
-    </>
+        <View style={styles.cardContent}>
+          <Text style={styles.title}>Users listings</Text>
+        </View>
+        {usersListings.length > 0 && (
+          <OtherUserListings
+            usersListings={usersListings}
+            focusedListing={listing}
+            // onPress={() => navigation.navigate("ListingDetails", item)}
+          />
+        )}
+        {/* </View> */}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bigContainer: { backgroundColor: colors.white },
-  /******** card **************/
-  card: {
-    shadowColor: colors.dark,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 10.49,
-    elevation: 4,
-
-    marginVertical: 2,
-    backgroundColor: "white",
-    marginHorizontal: 0,
-  },
-  cardContent: {
-    paddingVertical: 12.5,
-    paddingHorizontal: 16,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingTop: 12.5,
-    paddingBottom: 0,
-
-    paddingHorizontal: 16,
-    borderBottomLeftRadius: 1,
-    borderBottomRightRadius: 1,
-  },
-  cardTitle: {
-    color: colors.dark,
-    fontSize: 20,
-  },
-  cardDescription: {
-    fontSize: 18,
-    color: colors.dark,
-  },
-  img: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
   box: {
-    shadowColor: colors.dark,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 10.49,
-    elevation: 10,
+    // shadowColor: colors.dark,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 1,
+    // },
+    // shadowOpacity: 0.37,
+    // shadowRadius: 10.49,
+    // elevation: 10,
     padding: 10,
     marginTop: 2,
     marginBottom: 5,
     // marginRight: 5,
     backgroundColor: colors.white,
     flexDirection: "row",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "500",
   },
   boxContent: {
     flex: 1,
@@ -364,10 +372,6 @@ const styles = StyleSheet.create({
   titlu: {
     fontSize: 18,
     color: "#151515",
-  },
-  description: {
-    fontSize: 15,
-    color: colors.dark,
   },
   buttons: {
     flexDirection: "row",
@@ -395,64 +399,109 @@ const styles = StyleSheet.create({
   message: {
     backgroundColor: "#228B22",
   },
-  background: {
-    height: "100%",
-    width: "100%",
-    // top: 150,
-    // position: "absolute",
-    flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: colors.secondary,
+  img: {
+    width: 100,
+    height: 100,
     borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 15,
-    width: "20%",
-    // height: 20,
-    // marginLeft: 200,
-    // marginTop: 0,
-    top: 370,
-    right: 20,
-    // color: colors.dark,
-    position: "absolute",
   },
-  text: {
-    color: colors.white,
-    fontSize: 18,
-    textTransform: "uppercase",
-    fontWeight: "bold",
+  container: {
+    flex: 1,
+    marginTop: 20,
+    backgroundColor: "#ebf0f7",
   },
-  detailsContainer: {
-    // backgroundColor: colors.light,
-    paddingLeft: 20,
-    display: "flex",
-    // flexDirection: "row",
+  content: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 20,
+    marginBottom: 15,
   },
-  detailsContainer2: {
-    paddingBottom: 20,
-    // paddingLeft: 10,
-    display: "flex",
-    // flexDirection: "row",
+  header: {
+    flexDirection: "row",
   },
-  image: {
-    width: "100%",
+  mainImage: {
+    width: 200,
     height: 200,
   },
+  smallImagesContainer: {
+    flexDirection: "column",
+    marginLeft: 30,
+  },
+  smallImage: {
+    width: 60,
+    height: 60,
+    marginTop: 5,
+  },
+  btnColor: {
+    height: 40,
+    width: 40,
+    borderRadius: 40,
+    marginHorizontal: 3,
+  },
+  contentColors: {
+    flexDirection: "row",
+  },
+  name: {
+    fontSize: 22,
+    color: "#696969",
+    fontWeight: "bold",
+  },
   price: {
+    marginTop: 10,
+
     color: colors.dark,
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 15,
     marginVertical: 0,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "500",
+  description: {
+    fontSize: 18,
+    color: "#696969",
   },
-  userContainer: {
-    marginVertical: 40,
+  shareButton: {
+    marginTop: 10,
+    height: 45,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 30,
+    backgroundColor: "#00BFFF",
+  },
+  shareButtonText: {
+    color: "#FFFFFF",
+    fontSize: 20,
+  },
+
+  /******** card **************/
+  card: {
+    shadowColor: "#00000021",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+
+    marginVertical: 5,
+    backgroundColor: "white",
+    marginHorizontal: 5,
+  },
+  cardContent: {
+    paddingVertical: 12.5,
+    paddingHorizontal: 16,
+  },
+  cardHeader: {
+    // flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 12.5,
+    paddingBottom: 10,
+    paddingHorizontal: 16,
+    borderBottomLeftRadius: 1,
+    borderBottomRightRadius: 1,
+  },
+  cardTitle: {
+    color: colors.dark,
+    fontSize: 20,
   },
 });
 

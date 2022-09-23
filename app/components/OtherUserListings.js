@@ -50,7 +50,7 @@ export default function OtherUserListings({ usersListings, focusedListing }) {
                 keyStyle={colors.dark}
                 keyBorderWidth={1.5}
                 key={listing.key}
-                imageUri={{ uri: listing.img_uri }}
+                imageUri={{ uri: listing.img_uri[0] }}
                 name={listing.title}
                 onPress={() => {
                   handleFocused(listing.key);

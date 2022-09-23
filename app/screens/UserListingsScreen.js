@@ -59,8 +59,8 @@ function UserListingsScreen({ navigation }) {
     querySnapshot.forEach((doc) => {
       // console.log(usersPosts.length);
       if (doc.data().user === auth.currentUser.email) {
-        console.log("yes");
-        console.log("curent user...", auth.currentUser.email);
+        // console.log("yes");
+        // console.log("curent user...", auth.currentUser.email);
         usersPosts.push({ ...doc.data(), key: doc.id });
       }
       // console.log(usersPosts.length);
@@ -71,8 +71,8 @@ function UserListingsScreen({ navigation }) {
 
     for (let i = 0; i < usersPosts.length; i++) {
       // console.log(usersPosts[i]);
-      console.log(usersPosts[i].user);
-      console.log(usersPosts[i].img_name);
+      // console.log(usersPosts[i].user);
+      // console.log(usersPosts[i].img_name);
       const reference = ref(
         storage,
         `images/${auth.currentUser.email}/posts/${usersPosts[i].img_name}`
@@ -99,6 +99,7 @@ function UserListingsScreen({ navigation }) {
   useEffect(() => {
     console.log("USE EFFECTT FOR LISTINGS.................................");
     retrieveData();
+    console.log("listings for user...", listings);
   }, []);
 
   return (
@@ -109,11 +110,14 @@ function UserListingsScreen({ navigation }) {
         keyExtractor={(listing) => listing.key.toString()}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
+          // <Text>{item.description}</Text>
           <ListItem
             title={item.title}
-            subTitle={item.description}
+            subTitle={
+              item.description.length > 0 ? item.description : "No description"
+            }
             image={{ uri: item.img_uri }}
-            onPress={() => navigation.navigate("ListingDetails", item)}
+            onPress={() => navigation.navigate("UserListingDetails", item)}
             renderRightActions={() => (
               <ListItemDeleteAction onPress={() => handleDelete(item)} />
             )}

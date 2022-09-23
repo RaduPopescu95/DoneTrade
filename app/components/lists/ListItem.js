@@ -26,7 +26,7 @@ function ListItem({
               <Text style={styles.title} numberOfLines={1}>
                 {title}
               </Text>
-              {subTitle && (
+              {subTitle !== "No description" && (
                 <Text style={styles.subTitle} numberOfLines={2}>
                   {subTitle}
                 </Text>

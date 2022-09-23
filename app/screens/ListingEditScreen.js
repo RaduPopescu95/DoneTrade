@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Alert } from "react-native";
 import * as Yup from "yup";
 import useLocation from "../hooks/useLocation";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
@@ -107,10 +107,12 @@ function ListingEditScreen() {
   const [loading, setLoading] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [fileNames, setFileNames] = useState([]);
   const location = useLocation();
   const navigation = useNavigation();
   const auth = authentication;
   const allInputs = { imgUrl: "" };
+  const fileNamesArray = [];
 
   // const db = firebase.firestore
 
@@ -122,7 +124,7 @@ function ListingEditScreen() {
     const collectionIds = currentUserOnline;
     setUploadVisible(false);
     // console.log(collectionIds.email);
-
+    // setLoading(false);
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         // console.log(user.uid);
@@ -132,18 +134,23 @@ function ListingEditScreen() {
     });
   }, []);
 
-  const uploadImage = async (image) => {
+  const uploadImage = async (images) => {
     setLoading(true);
-
-    const fileName = image.split("/").pop();
-    const fileType = fileName.split(".").pop();
-    const storageRef = ref(
-      storage,
-      `images/${currentUserOnline.email}/posts/${fileName}`
-    );
-    const img = await fetch(image);
-    const bytes = await img.blob();
-    await uploadBytes(storageRef, bytes);
+    for (let i = 0; i < images.length; i++) {
+      console.log("values images2...", images[i]);
+      const fileName = images[i].split("/").pop();
+      const fileType = fileName.split(".").pop();
+      const storageRef = ref(
+        storage,
+        `images/${currentUserOnline.email}/posts/${fileName}`
+      );
+      console.log("img...No");
+      const img = await fetch(images[i]);
+      console.log("img...Yes");
+      const bytes = await img.blob();
+      // console.log("bytes...", JSON.stringify(bytes));
+      await uploadBytes(storageRef, bytes);
+    }
     setLoading(false);
     setUploadVisible(true);
     if (!uploadVisible) {
@@ -153,26 +160,49 @@ function ListingEditScreen() {
       }, 1500);
     }
 
-    // setUploadVisible(false);
+    setUploadVisible(false);
   };
 
   const handleAddItem = async (values, { resetForm }, file) => {
-    console.log("ADD ITEM..", values);
+    // console.log("ADD ITEM..", values);
     const unsub = query(
       collection(db, "Users"),
       where("owner_uid", "==", userId)
     );
     const docUpdated = doc(db, "Users", currentUserOnline.email);
     const Titlu = values.title;
+
     if (values.images) {
-      console.log(values.images);
+      console.log("values images....3", values.images);
       setImageUrl(values.images);
     }
+    console.log("imageUrl...", imageUrl);
     // Add POSTS TO USER
     try {
       const docRef = doc(db, "Users", currentUserOnline.email);
       const colRef = collection(docRef, "Posts");
-      const fileName = values.images[0].split("/").pop();
+      for (let i = 0; i < values.images.length; i++) {
+        console.log("values images2...", values.images[i]);
+        const fileName = values.images[i].split("/").pop();
+        fileNamesArray.push(fileName);
+      }
+      console.log("fileNamesArrayNew...", fileNamesArray);
+
+      if (fileNamesArray.length > 4) {
+        Alert.alert(
+          "Maximum 4 photos allowed for upload!",
+          `Please delete ${fileNamesArray.length - 4} photos and continue`,
+          [
+            {
+              text: "Ok",
+              onPress: () => console.log("Ok Pressed"),
+              style: "cancel",
+            },
+          ]
+        );
+        return;
+      }
+      console.log("returned?...");
       addDoc(colRef, {
         // image: values.images,
         user: currentUserOnline.email,
@@ -185,13 +215,13 @@ function ListingEditScreen() {
         likes: 0,
         comments: [],
         likes_by_users: [],
-        img_name: fileName,
+        img_names: fileNamesArray,
       });
-      uploadImage(values.images[0]);
-      // alert("Success");
-      resetForm();
+      uploadImage(values.images);
+      //   // alert("Success");
+      //   resetForm();
     } catch (err) {
-      // alert("Could not save the listing", err);
+      console.log("Could not save the listing", err);
     }
   };
 
