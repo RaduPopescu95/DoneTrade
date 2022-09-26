@@ -70,26 +70,31 @@ function UserListingsScreen({ navigation }) {
     const newListings = [...listings];
 
     for (let i = 0; i < usersPosts.length; i++) {
-      // console.log(usersPosts[i]);
-      // console.log(usersPosts[i].user);
-      // console.log(usersPosts[i].img_name);
-      const reference = ref(
-        storage,
-        `images/${auth.currentUser.email}/posts/${usersPosts[i].img_name}`
-      );
-      await getDownloadURL(reference).then((x) => {
-        // console.log(usersPosts[i]);
-        // console.log(x);
-        usersPosts[i].img_uri = x;
-        // setUrl(x);
-        newListings.forEach((element) => {
-          element.img_uri = x;
+      const img_uri = [];
+      for (let z = 0; z < usersPosts[i].img_names.length; z++) {
+        console.log("img names...", usersPosts[i].img_names[z]);
+        const reference = ref(
+          storage,
+          `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
+        );
+        await getDownloadURL(reference).then((x) => {
+          // console.log(usersPosts[i]);
+          console.log("xxx", x);
+          img_uri.push(x);
+
+          // setUrl(x);
+          // newListings.forEach((element) => {
+          //   element.img_uri = x;
+          // });
         });
-      });
-      usersEmailImgName.push({
-        email: usersPosts[i].user,
-        post_img: usersPosts[i].img_name,
-      });
+      }
+      usersPosts[i].img_uri = [...img_uri];
+      usersPosts[i].first_img_uri = img_uri[0];
+      console.log("firstimageuri...", usersPosts[i].first_img_uri);
+      // usersEmailImgName.push({
+      //   email: usersPosts[i].user,
+      //   post_img: usersPosts[i].img_names[0],
+      // });
     }
     setListings(usersPosts);
     setLoading(false);
@@ -116,7 +121,7 @@ function UserListingsScreen({ navigation }) {
             subTitle={
               item.description.length > 0 ? item.description : "No description"
             }
-            image={{ uri: item.img_uri }}
+            image={{ uri: item.img_uri[0] }}
             onPress={() => navigation.navigate("UserListingDetails", item)}
             renderRightActions={() => (
               <ListItemDeleteAction onPress={() => handleDelete(item)} />

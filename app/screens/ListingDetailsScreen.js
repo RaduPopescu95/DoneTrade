@@ -122,29 +122,31 @@ function ListingDetailsScreen({ route }) {
     // console.log("all users posts...", usersPosts);
     console.log("start 1 FOR SETTINGS USERS POSTS");
     // const newListings = [...usersListings];
-
     for (let i = 0; i < usersPosts.length; i++) {
-      // console.log(usersPosts[i]);
-      // console.log("loops for settings users posts...", usersPosts[i].user);
-      // console.log("loops for settings users posts1...", usersPosts[i]);
-      // console.log("loops for settings users posts2...", usersPosts[i].img_name);
-      // console.log(usersPosts[i].img_name);
-      const reference = ref(
-        storage,
-        `images/${usersPosts[i].user}/posts/${usersPosts[i].img_name}`
-      );
-      await getDownloadURL(reference).then((x) => {
-        // console.log(usersPosts[i]);
-        // console.log("xxx....", x);
-        usersPosts[i].img_uri = x;
-        // setUrl(x);
-        // newListings.forEach((element) => {
-        //   element.img_uri = x;
-        // });
-      });
+      const img_uri = [];
+      for (let z = 0; z < usersPosts[i].img_names.length; z++) {
+        console.log("img names...", usersPosts[i].img_names[z]);
+        const reference = ref(
+          storage,
+          `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
+        );
+        await getDownloadURL(reference).then((x) => {
+          // console.log(usersPosts[i]);
+          console.log("xxx", x);
+          img_uri.push(x);
+
+          // setUrl(x);
+          // newListings.forEach((element) => {
+          //   element.img_uri = x;
+          // });
+        });
+      }
+      usersPosts[i].img_uri = [...img_uri];
+      usersPosts[i].first_img_uri = img_uri[0];
+      console.log("firstimageuri...", usersPosts[i].first_img_uri);
       // usersEmailImgName.push({
       //   email: usersPosts[i].user,
-      //   post_img: usersPosts[i].img_name,
+      //   post_img: usersPosts[i].img_names[0],
       // });
     }
     console.log("final users...posts.1..", usersPosts);
@@ -223,8 +225,9 @@ function ListingDetailsScreen({ route }) {
     console.log("useefect userslistings...", usersListings);
     // console.log(firstName, lastName, email);
     // console.log("EMAIL CURENT USER....", auth.currentUser.email);
+    handleChangeImages(listing.img_uri[0]);
     retrieveData();
-  }, [isEditing]);
+  }, [isEditing, listing]);
 
   const __renderImages = () => {
     return (
@@ -327,7 +330,7 @@ function ListingDetailsScreen({ route }) {
           </View>
         </View>
         <View style={styles.cardContent}>
-          <Text style={styles.title}>Users listings</Text>
+          <Text style={styles.title}>User listings</Text>
         </View>
         {usersListings.length > 0 && (
           <OtherUserListings

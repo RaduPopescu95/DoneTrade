@@ -68,6 +68,7 @@ function ListingsScreen({ navigation }) {
   const [currentUserOnline, setCurrentUserOnline] = useState("");
   const auth = authentication;
   const imageUri = "";
+  const usersPosts = [];
 
   const retrieveData = async () => {
     // GOOD FOR RETRIEVE ONE DOC
@@ -94,33 +95,35 @@ function ListingsScreen({ navigation }) {
     //GOOD FOR GETTING SUB COLLECTION
     console.log("Retreving data Listings---------------------------");
     setLoading(true);
-    const usersPosts = [];
+
     const usersEmailImgName = [];
     const posts = query(collectionGroup(db, "Posts"));
     const querySnapshot = await getDocs(posts);
     // console.log("query...", querySnapshot);
     querySnapshot.forEach((doc) => {
-      console.log("doc.data...", doc.data());
+      // console.log("doc.data...", doc.data());
       // console.log(usersPosts.length);
       usersPosts.push({ ...doc.data(), key: doc.id });
       // console.log(usersPosts.length);
     });
-    console.log("usersPosts...", usersPosts);
-    console.log("start 1");
+    // console.log("usersPosts...", usersPosts);
+    // console.log("start 1");
     const newListings = [...listings];
-    const img_uri = [];
 
     for (let i = 0; i < usersPosts.length; i++) {
+      const img_uri = [];
       for (let z = 0; z < usersPosts[i].img_names.length; z++) {
-        console.log("img names...", usersPosts[i].img_names[z]);
+        console.log(`img names...${z}`, usersPosts[i].img_names[z]);
         const reference = ref(
           storage,
           `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
         );
+
         await getDownloadURL(reference).then((x) => {
           // console.log(usersPosts[i]);
-          console.log("xxx", x);
+
           img_uri.push(x);
+          console.log(`xxx...img uri${z}`, img_uri);
 
           // setUrl(x);
           // newListings.forEach((element) => {
@@ -128,17 +131,19 @@ function ListingsScreen({ navigation }) {
           // });
         });
       }
+      // console.log("image uris...", img_uri);
       usersPosts[i].img_uri = [...img_uri];
       usersPosts[i].first_img_uri = img_uri[0];
-      console.log("firstimageuri...", usersPosts[i].first_img_uri);
+
+      // console.log("firstimageuri...", usersPosts[i].first_img_uri);
       usersEmailImgName.push({
         email: usersPosts[i].user,
         post_img: usersPosts[i].img_names[0],
       });
     }
     setLoading(false);
-    console.log("UsersPosts2...", usersPosts);
-    // console.log("imgs urisss...", usersPosts.img_uri[0]);
+    // console.log("UsersPosts2...", usersPosts);
+    // console.log("imgs urisss...", usersPosts[0].img_uri);
     // imageUri = usersPosts.img_uri[0];
     setListings(usersPosts);
     setRefreshing(false);
@@ -147,6 +152,7 @@ function ListingsScreen({ navigation }) {
   useEffect(() => {
     console.log("USE EFFECTT FOR LISTINGS.................................");
     retrieveData();
+    // console.log("listings...here", listings[2].img_uri[0]);
   }, []);
 
   return (
@@ -169,7 +175,7 @@ function ListingsScreen({ navigation }) {
             <Card
               title={item.title}
               subTitle={"$" + item.price}
-              image={{ uri: item.first_img_uri }}
+              image={{ uri: item.img_uri[0] }}
               // image={require("../assets/chair.jpg")}
               onPress={() => navigation.navigate("ListingDetails", item)}
             />

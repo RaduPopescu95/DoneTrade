@@ -30,7 +30,9 @@ export default function OtherUserListings({ usersListings, focusedListing }) {
       startHeaderHeight = 100 + StatusBar.currentHeight;
     }
     console.log("usersListings...in component", usersListings);
-
+    for (let i = 0; i < usersListings.length; i++) {
+      console.log(`loop ${i}`, usersListings[i]);
+    }
     handleFocused(focusedListing.key);
   }, []);
 
@@ -58,15 +60,17 @@ export default function OtherUserListings({ usersListings, focusedListing }) {
                 }}
               />
             ) : (
+              // <Text key={listing.key}>{listing.title}</Text>
               <Category
                 key={listing.key}
-                imageUri={{ uri: listing.img_uri }}
+                imageUri={{ uri: listing.img_uri[0] }}
                 name={listing.title}
                 onPress={() => {
                   handleFocused(listing.key);
                   navigation.navigate("ListingDetails", listing);
                 }}
               />
+              // <Text key={listing.key}>{listing.img_uri[0]}</Text>
             )
           )}
         </ScrollView>
