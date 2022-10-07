@@ -7,6 +7,7 @@ export default function ImageInputList({
   imageUris = [],
   onRemoveImage,
   onAddImage,
+  images,
 }) {
   const scrollView = useRef();
 

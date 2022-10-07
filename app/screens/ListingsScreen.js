@@ -101,7 +101,7 @@ function ListingsScreen({ navigation }) {
     const querySnapshot = await getDocs(posts);
     // console.log("query...", querySnapshot);
     querySnapshot.forEach((doc) => {
-      // console.log("doc.data...", doc.data());
+      // console.log("doc.idd...", doc.id);
       // console.log(usersPosts.length);
       usersPosts.push({ ...doc.data(), key: doc.id });
       // console.log(usersPosts.length);

@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   cardContent: {
-    paddingVertical: 12.5,
+    paddingVertical: 6.5,
     paddingHorizontal: 16,
   },
   cardHeader: {

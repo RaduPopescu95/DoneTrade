@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Alert } from "react-native";
 import * as Yup from "yup";
 import useLocation from "../hooks/useLocation";
-import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+  deleteObject,
+} from "firebase/storage";
 import LottieView from "lottie-react-native";
 
 import {
@@ -98,7 +103,7 @@ const categories = [
   },
 ];
 
-function ListingEditScreen() {
+function UpdateListingScreen({ route }) {
   const [signedIn, setSignedIn] = useState(false);
   const [userId, setUserId] = useState("");
   const [currentUserOnline, setCurrentUserOnline] = useState("");
@@ -112,12 +117,13 @@ function ListingEditScreen() {
   const navigation = useNavigation();
   const auth = authentication;
   const allInputs = { imgUrl: "" };
-  const fileNamesArray = [];
-
+  let fileNamesArray = [];
+  const listing = route.params;
   // const db = firebase.firestore
 
   useEffect(() => {
     console.log("useEffect for edit started");
+    // console.log("Listings...to edit", listing);
 
     setCurrentUserOnline(auth.currentUser);
 
@@ -135,6 +141,9 @@ function ListingEditScreen() {
   }, []);
 
   const uploadImage = async (images) => {
+    console.log("new images...", images);
+    console.log("old images...", listing.img_names);
+
     setLoading(true);
     for (let i = 0; i < images.length; i++) {
       console.log("values images2...", images[i]);
@@ -151,6 +160,26 @@ function ListingEditScreen() {
       // console.log("bytes...", JSON.stringify(bytes));
       await uploadBytes(storageRef, bytes);
     }
+
+    // Delete old photos from storage
+    for (let i = 0; i < listing.img_names.length; i++) {
+      // Create a reference to the file to delete
+      console.log(`${i} img...`, listing.img_names[i]);
+      const desertRef = ref(
+        storage,
+        `images/${currentUserOnline.email}/posts/${listing.img_names[i]}`
+      );
+      // Delete the file
+      deleteObject(desertRef)
+        .then(() => {
+          // File deleted successfully
+          console.log("deleted file...");
+        })
+        .catch((error) => {
+          console.log("error deleting file...", error);
+          // Uh-oh, an error occurred!
+        });
+    }
     setLoading(false);
     setUploadVisible(true);
     if (!uploadVisible) {
@@ -159,7 +188,6 @@ function ListingEditScreen() {
         navigation.goBack();
       }, 1500);
     }
-
     setUploadVisible(false);
   };
 
@@ -169,25 +197,32 @@ function ListingEditScreen() {
       collection(db, "Users"),
       where("owner_uid", "==", userId)
     );
-    const docUpdated = doc(db, "Users", currentUserOnline.email);
+
     const Titlu = values.title;
 
-    if (values.images) {
-      console.log("values images....3", values.images);
-      setImageUrl(values.images);
-    }
-    console.log("imageUrl...", imageUrl);
+    // if (values.images) {
+    //   console.log("values images....3", values.images);
+    //   setImageUrl(values.images);
+    // }
+    // console.log("imageUrl...", imageUrl);
     // Add POSTS TO USER
+    // try {
+    // console.log("key of listing...", listing.key);
     try {
-      const docRef = doc(db, "Users", currentUserOnline.email);
-      const colRef = collection(docRef, "Posts");
+      const docUpdated = doc(
+        db,
+        "Users",
+        currentUserOnline.email,
+        "Posts",
+        listing.key
+      );
+      const colRef = collection(docUpdated, "Posts");
+      // console.log("document s...", docUpdated);
       for (let i = 0; i < values.images.length; i++) {
-        console.log("values images2...", values.images[i]);
+        console.log("values images3...", values.images[i]);
         const fileName = values.images[i].split("/").pop();
         fileNamesArray.push(fileName);
       }
-      console.log("fileNamesArrayNew...", fileNamesArray);
-
       if (fileNamesArray.length > 4) {
         Alert.alert(
           "Maximum 4 photos allowed for upload!",
@@ -195,7 +230,7 @@ function ListingEditScreen() {
           [
             {
               text: "Ok",
-              onPress: () => console.log("Ok Pressed"),
+              onPress: () => (fileNamesArray = []),
               style: "cancel",
             },
           ]
@@ -203,23 +238,41 @@ function ListingEditScreen() {
         return;
       }
       console.log("returned?...");
-      addDoc(colRef, {
-        // image: values.images,
-        user: currentUserOnline.email,
-        owner_uid: currentUserOnline.uid,
+      // UPDATE FIELDS IN DOCUMENT
+      await updateDoc(docUpdated, {
+        // user: currentUserOnline.email,
+        // owner_uid: currentUserOnline.uid,
         title: values.title,
         price: values.price,
         category: values.category,
         description: values.description,
-        createdAt: serverTimestamp(),
-        likes: 0,
-        comments: [],
-        likes_by_users: [],
+        updatedAt: serverTimestamp(),
+        // likes: 0,
+        // comments: [],
+        // likes_by_users: [],
         img_names: fileNamesArray,
       });
       uploadImage(values.images);
-      //   // alert("Success");
-      //   resetForm();
+
+      //   console.log("fileNamesArrayNew...", fileNamesArray);
+
+      //   addDoc(colRef, {
+      //     // image: values.images,
+      //     user: currentUserOnline.email,
+      //     owner_uid: currentUserOnline.uid,
+      //     title: values.title,
+      //     price: values.price,
+      //     category: values.category,
+      //     description: values.description,
+      //     createdAt: serverTimestamp(),
+      //     likes: 0,
+      //     comments: [],
+      //     likes_by_users: [],
+      //     img_names: fileNamesArray,
+      //   });
+
+      //   //   // alert("Success");
+      //   //   resetForm();
     } catch (err) {
       console.log("Could not save the listing", err);
     }
@@ -229,26 +282,25 @@ function ListingEditScreen() {
     <Screen style={styles.container}>
       <Loader visible={loading} />
       <UploadScreen visible={uploadVisible} />
-
       <Form
         initialValues={{
-          title: "",
-          price: "",
-          description: "",
-          category: null,
-          images: [],
+          title: listing.title,
+          price: listing.price,
+          description: listing.description,
+          category: listing.category.label,
+          images: listing.img_uri,
         }}
         // onSubmit={(values) => console.log(location)}
         onSubmit={handleAddItem}
         validationSchema={validationSchema}
       >
-        <FormImagePicker name="images" />
-        <FormField maxLength={255} name="title" placeholder="Title" />
+        <FormImagePicker name="images" images={listing.img_uri} />
+        <FormField maxLength={255} name="title" placeholder={listing.title} />
         <FormField
           keyboardType="numeric"
           maxLength={8}
           name="price"
-          placeholder="Price"
+          placeholder={listing.price}
           width={120}
           defaultValue={0}
         />
@@ -265,9 +317,9 @@ function ListingEditScreen() {
           multiline
           name="description"
           numberOfLines={3}
-          placeholder="Description"
+          placeholder={listing.description}
         />
-        <SubmitButton title="Post" />
+        <SubmitButton title="Update Listing" />
       </Form>
     </Screen>
   );
@@ -279,4 +331,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light,
   },
 });
-export default ListingEditScreen;
+export default UpdateListingScreen;

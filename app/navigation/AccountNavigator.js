@@ -5,6 +5,7 @@ import MessagesScreen from "../screens/MessagesScreen";
 import UserListingsScreen from "../screens/UserListingsScreen";
 import UserListingDetails from "../screens/UserListingDetails";
 import UsersListingNavigator from "./UsersListingsNavigator";
+import UpdateListingScreen from "../screens/UpdateListingScreen";
 
 const Stack = createNativeStackNavigator();
 const screenOption = {
@@ -28,6 +29,11 @@ const AccountNavigator = () => (
     <Stack.Screen
       name="UserListingsDetails"
       component={UserListingDetails}
+      // options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="UpdateListingScreen"
+      component={UpdateListingScreen}
       // options={{ headerShown: false }}
     />
   </Stack.Navigator>

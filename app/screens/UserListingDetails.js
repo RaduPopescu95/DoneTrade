@@ -38,7 +38,7 @@ import ContactSellerForm from "../components/ContactSellerForm";
 import ImageInput from "../components/ImageInput";
 import OtherUserListings from "../components/OtherUserListings";
 
-export default function UserListingDetails({ route }) {
+export default function UserListingDetails({ route, navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [userSelected, setUserSelected] = useState([]);
   const [selectedImage, setSelectedImage] = useState({});
@@ -72,21 +72,46 @@ export default function UserListingDetails({ route }) {
     setSelectedImage({ selectedImage: image });
   };
 
+  const [firstImage, setFirstImage] = useState(listing.img_uri[0]);
+  const [secondImages, setSecondImages] = useState(listing.img_uri);
+  let result = [...listing.img_uri];
+  const handleChangeImages = (img) => {
+    // console.log("imgg...", img);
+    // console.log("second img...", secondImages);
+    // result = result.filter((i) => i !== img);
+    // console.log("second img...", secondImages);
+    setSecondImages(result.filter((i) => i !== img));
+    // console.log("second img2222...", secondImages);
+    setFirstImage(img);
+    // console.log("firstimages...", firstImage);
+
+    // console.log("result...", result);
+  };
+
   const __renderImages = () => {
     return (
       <View style={styles.smallImagesContainer}>
-        {product.images.map((prop, key) => {
-          return (
-            <TouchableOpacity
-              key={key}
-              onPress={() => {
-                __setImageSelected(prop);
-              }}
-            >
-              <Image style={styles.smallImage} source={{ uri: prop }} />
-            </TouchableOpacity>
-          );
-        })}
+        <TouchableOpacity
+          onPress={() => {
+            handleChangeImages(secondImages[0]);
+          }}
+        >
+          <Image style={styles.smallImage} source={{ uri: secondImages[0] }} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            handleChangeImages(secondImages[1]);
+          }}
+        >
+          <Image style={styles.smallImage} source={{ uri: secondImages[1] }} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            handleChangeImages(secondImages[2]);
+          }}
+        >
+          <Image style={styles.smallImage} source={{ uri: secondImages[2] }} />
+        </TouchableOpacity>
       </View>
     );
   };
@@ -109,10 +134,7 @@ export default function UserListingDetails({ route }) {
           <View style={styles.cardContent}>
             <View style={styles.header}>
               <View style={styles.mainImageContainer}>
-                <Image
-                  style={styles.mainImage}
-                  source={{ uri: listing.first_img_uri }}
-                />
+                <Image style={styles.mainImage} source={{ uri: firstImage }} />
               </View>
               {__renderImages()}
             </View>
@@ -122,7 +144,7 @@ export default function UserListingDetails({ route }) {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Price</Text>
-            <Text style={styles.cardTitle}>${listing.price}</Text>
+            <Text style={styles.price}>${listing.price}</Text>
           </View>
           {/* <View style={styles.cardContent}>{__renderColors()}</View> */}
         </View>
@@ -140,7 +162,9 @@ export default function UserListingDetails({ route }) {
           <View style={styles.cardContent}>
             <TouchableOpacity
               style={styles.shareButton}
-              onPress={() => this.clickEventListener()}
+              onPress={() =>
+                navigation.navigate("UpdateListingScreen", listing)
+              }
             >
               <Text style={styles.shareButtonText}>Edit Listing</Text>
             </TouchableOpacity>
@@ -193,10 +217,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   price: {
-    marginTop: 10,
-    fontSize: 18,
-    color: "green",
+    marginTop: 15,
+
+    color: colors.dark,
     fontWeight: "bold",
+    fontSize: 15,
+    marginVertical: 0,
   },
   description: {
     fontSize: 18,
@@ -209,7 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    backgroundColor: "#00BFFF",
+    backgroundColor: colors.primary,
   },
   shareButtonText: {
     color: "#FFFFFF",
@@ -236,15 +262,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   cardHeader: {
-    flexDirection: "row",
+    // flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: 12.5,
-    paddingBottom: 25,
+    paddingTop: 6.5,
+    paddingBottom: 15,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 1,
     borderBottomRightRadius: 1,
   },
   cardTitle: {
-    color: "#00BFFF",
+    color: colors.dark,
+    fontSize: 20,
+    marginTop: 5,
   },
 });

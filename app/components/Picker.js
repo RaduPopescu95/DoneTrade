@@ -38,11 +38,12 @@ function AppPicker({
               style={styles.icon}
             />
           )}
-          {selectedItem ? (
-            <Text style={styles.text}>{selectedItem.label}</Text>
-          ) : (
-            <Text style={styles.placeholder}>{placeholder}</Text>
-          )}
+          {/* {selectedItem ? (
+            <Text style={styles.text}>{selectedItem}</Text>
+            ) : (
+              <Text style={styles.placeholder}>{placeholder}</Text>
+              )} */}
+          <Text style={styles.text}>{selectedItem}</Text>
 
           <MaterialCommunityIcons
             name="chevron-down"
@@ -65,6 +66,7 @@ function AppPicker({
                 onPress={() => {
                   setModalVisible(false);
                   onSelectItem(item);
+                  // console.log("items...", item);
                 }}
               />
             )}
