@@ -11,7 +11,7 @@ import { useFormikContext } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
 
-export default function ProfilePictPicker({ onSelectProfileUri, name }) {
+export default function ProfilePictPicker({ onSelectProfileUri, name, img }) {
   const [image, setImage] = useState(null);
   const { errors, setFieldValue, touched, values } = useFormikContext();
 
@@ -51,6 +51,9 @@ export default function ProfilePictPicker({ onSelectProfileUri, name }) {
     <View style={imageUploaderStyles.container}>
       {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+      )}
+      {img && (
+        <Image source={{ uri: img }} style={{ width: 200, height: 200 }} />
       )}
 
       <View style={imageUploaderStyles.uploadBtnContainer}>

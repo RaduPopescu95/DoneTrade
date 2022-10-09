@@ -117,7 +117,7 @@ function AccountScreen({ navigation }) {
         name: "account",
         backgroundColor: colors.primary,
       },
-      targetScreen: "EditUserProfile",
+      targetScreen: "EditProfileScreen",
     },
     {
       id: 2,
