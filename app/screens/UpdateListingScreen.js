@@ -151,7 +151,7 @@ function UpdateListingScreen({ route }) {
       const fileType = fileName.split(".").pop();
       const storageRef = ref(
         storage,
-        `images/${currentUserOnline.email}/posts/${fileName}`
+        `images/posts/${currentUserOnline.uid}&&${fileName}`
       );
       console.log("img...No");
       const img = await fetch(images[i]);
@@ -167,7 +167,7 @@ function UpdateListingScreen({ route }) {
       console.log(`${i} img...`, listing.img_names[i]);
       const desertRef = ref(
         storage,
-        `images/${currentUserOnline.email}/posts/${listing.img_names[i]}`
+        `images/posts/${currentUserOnline.uid}&&${listing.img_names[i]}`
       );
       // Delete the file
       deleteObject(desertRef)
@@ -192,7 +192,8 @@ function UpdateListingScreen({ route }) {
   };
 
   const handleAddItem = async (values, { resetForm }, file) => {
-    // console.log("ADD ITEM..", values);
+    console.log("ADD ITEM..", values);
+    console.log("start 1");
     const unsub = query(
       collection(db, "Users"),
       where("owner_uid", "==", userId)
@@ -200,6 +201,7 @@ function UpdateListingScreen({ route }) {
 
     const Titlu = values.title;
 
+    console.log("start 2");
     // if (values.images) {
     //   console.log("values images....3", values.images);
     //   setImageUrl(values.images);
@@ -209,13 +211,15 @@ function UpdateListingScreen({ route }) {
     // try {
     // console.log("key of listing...", listing.key);
     try {
+      console.log("start 3");
       const docUpdated = doc(
         db,
         "Users",
-        currentUserOnline.email,
+        auth.currentUser.uid,
         "Posts",
         listing.key
       );
+      console.log("start 4");
       const colRef = collection(docUpdated, "Posts");
       // console.log("document s...", docUpdated);
       for (let i = 0; i < values.images.length; i++) {

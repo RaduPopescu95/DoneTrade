@@ -21,8 +21,10 @@ import {
   setDoc,
   updateDoc,
   where,
+  collectionGroup,
+  getDocs,
 } from "firebase/firestore";
-import { getAuth, updatePassword, signOut } from "firebase/auth";
+import { getAuth, updatePassword, signOut, updateEmail } from "firebase/auth";
 import { Formik, useFormikContext } from "formik";
 import { authentication, db, storage } from "../../../firebase";
 import {
@@ -83,6 +85,7 @@ function ProfileEditor({
   const [currentUserOnline, setCurrentUserOnline] = useState("");
   const auth = authentication;
   let confirmPassword = "confirmPassword";
+  let usersPosts = [];
   // const { handleSubmit } = useFormikContext();
   // const { setFieldTouched, handleChange, errors, touched } = useFormikContext();
 
@@ -154,10 +157,86 @@ function ProfileEditor({
       });
   };
 
+  const handleChangeEmail = async (newEmail) => {
+    //Update email in database
+    try {
+      const posts = query(collectionGroup(db, "Posts"));
+      const querySnapshot = await getDocs(posts);
+      querySnapshot.forEach((doc) => {
+        // console.log(usersPosts.length);
+        if (doc.data().user === auth.currentUser.email) {
+          // console.log("yes");
+          // console.log("curent user...", auth.currentUser.email);
+          usersPosts.push({ ...doc.data(), key: doc.id });
+        }
+        // console.log(usersPosts.length);
+      });
+      for (let i = 0; i < usersPosts.length; i++) {
+        console.log("usersposts...", usersPosts[i].key);
+        const docUpdated = doc(
+          db,
+          "Users",
+          currentUserOnline.uid,
+          "Posts",
+          usersPosts[i].key
+        );
+        await updateDoc(docUpdated, {
+          user: newEmail,
+        });
+      }
+    } catch (err) {
+      console.log(
+        "error at updating email in database of posts of user...",
+        err
+      );
+    }
+
+    console.log("SUCCES UPDATING EMAIL IN POSTS OF USER");
+    //Update email in authentification
+    updateEmail(auth.currentUser, newEmail)
+      .then(() => {
+        console.log("Email updated!");
+      })
+      .catch((error) => {
+        console.log("An error occurred updating email auth", error);
+      });
+
+    Alert.alert(`Email changed!`, `Please login again in your account`, [
+      {
+        text: "Ok",
+        onPress: () => {
+          signOut(auth)
+            .then((re) => {
+              setIsSignedIn(false);
+              console.log("signedOut");
+              navigation.replace("LoginScreen");
+            })
+            .catch((error) => {
+              console.log(
+                "error on sign out after email change...",
+                error.message
+              );
+            });
+          // navigation.navigate("LoginScreen")
+        },
+        style: "cancel",
+      },
+    ]);
+  };
+
   const handleAddItem = async (values, { resetForm }, file) => {
     if (option.title === "Change password") {
       console.log("passs....", values.password);
       handleChangePassword(values.password);
+      return;
+    }
+    if (option.title === "Email") {
+      console.log("EMAIL....", values.email);
+      const docUpdated = doc(db, "Users", currentUserOnline.uid);
+      await updateDoc(docUpdated, {
+        [firebaseParam]: values[initialValue],
+      });
+      handleChangeEmail(values.email);
       return;
     }
     console.log("EDIT ITEM..", values);
@@ -165,7 +244,7 @@ function ProfileEditor({
     //   collection(db, "Users"),
     //   where("owner_uid", "==", userId)
     // );
-    const docUpdated = doc(db, "Users", currentUserOnline.email);
+    const docUpdated = doc(db, "Users", currentUserOnline.uid);
     await updateDoc(docUpdated, {
       [firebaseParam]: values[initialValue],
     });
@@ -279,7 +358,9 @@ function ProfileEditor({
               <TextInput
                 onFocus={handleFocus}
                 onBlur={handleFocus}
-                secureTextEntry
+                secureTextEntry={
+                  option.title === "Change password" ? true : false
+                }
                 style={[
                   {
                     height: 45,

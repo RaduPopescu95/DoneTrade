@@ -57,8 +57,8 @@ function ListingDetailsScreen({ route }) {
   const retrieveData = async () => {
     // GOOD FOR RETRIEVE ONE DOC
     // console.log("test1");
-    // console.log(listing.user);
-    const docRef = doc(db, "Users", listing.user);
+    console.log("listing user...", listing.owner_uid);
+    const docRef = doc(db, "Users", listing.owner_uid);
     // console.log("DOCREF...", docRef);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -89,10 +89,7 @@ function ListingDetailsScreen({ route }) {
       // console.log("present user...", listing.user);
       setIsPresentUser(true);
     }
-    const reference = ref(
-      storage,
-      `images/${listing.user}/profilePict/${listing.user}`
-    );
+    const reference = ref(storage, `images/profilePict/${listing.owner_uid}`);
     await getDownloadURL(reference).then((x) => {
       setProfilePicture(x);
     });
@@ -128,7 +125,7 @@ function ListingDetailsScreen({ route }) {
         console.log("img names...", usersPosts[i].img_names[z]);
         const reference = ref(
           storage,
-          `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
+          `images/posts/${usersPosts[i].owner_uid}&&${usersPosts[i].img_names[z]}`
         );
         await getDownloadURL(reference).then((x) => {
           // console.log(usersPosts[i]);

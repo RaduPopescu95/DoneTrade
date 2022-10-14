@@ -65,17 +65,19 @@ function UserListingsScreen({ navigation }) {
       }
       // console.log(usersPosts.length);
     });
-    // console.log(usersPosts);
+    console.log("users...posts...", usersPosts);
     console.log("start 1");
     const newListings = [...listings];
 
+    console.log("start 2");
     for (let i = 0; i < usersPosts.length; i++) {
+      console.log("start 3");
       const img_uri = [];
       for (let z = 0; z < usersPosts[i].img_names.length; z++) {
         console.log("img names...", usersPosts[i].img_names[z]);
         const reference = ref(
           storage,
-          `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
+          `images/posts/${usersPosts[i].owner_uid}&&${usersPosts[i].img_names[z]}`
         );
         await getDownloadURL(reference).then((x) => {
           // console.log(usersPosts[i]);

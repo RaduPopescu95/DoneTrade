@@ -14,14 +14,14 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import colors from "../config/colors";
 
-export default function SearchBox() {
+export default function SearchBox({ keyword }) {
   let startHeaderHeight = 80;
   const { height, width } = Dimensions.get("window");
-  useEffect(() => {
-    if (Platform.OS == "android") {
-      startHeaderHeight = 100 + StatusBar.currentHeight;
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (Platform.OS == "android") {
+  //     startHeaderHeight = 100 + StatusBar.currentHeight;
+  //   }
+  // }, []);
   return (
     <View
       style={{
@@ -55,6 +55,7 @@ export default function SearchBox() {
           placeholder="What are you looking for?"
           placeholderTextColor="grey"
           style={{ flex: 1, fontWeight: "700", backgroundColor: "white" }}
+          onChange={keyword}
         />
       </View>
     </View>

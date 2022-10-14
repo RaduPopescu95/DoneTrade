@@ -55,28 +55,23 @@ function RegisterScreen() {
     console.log(fileName);
     const fileType = fileName.split(".").pop();
     console.log("START 3");
-    const storageRef = ref(
-      storage,
-      `images/${values.email}/profilePict/${values.email}`
-    );
-    console.log("START 4");
-    const img = await fetch(values.profilePict);
-    console.log("START 5");
-    console.log("START 6");
-    const bytes = await img.blob();
-    console.log("START 7");
-    await uploadBytes(storageRef, bytes);
-    console.log("START 8");
-    console.log("HANDLESIGNUP");
+
     setUploadVisible(true);
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredentials) => {
-        setTimeout(function () {
+        setTimeout(async () => {
           const user = userCredentials.user;
+          const storageRef = ref(storage, `images/profilePict/${user.uid}`);
+
+          const img = await fetch(values.profilePict);
+
+          const bytes = await img.blob();
+
+          await uploadBytes(storageRef, bytes);
           console.log("Starting PASS");
           setIsSignedIn(true);
           const collectionId = "Users";
-          const documentId = values.email;
+          const documentId = user.uid;
           const value = {
             owner_uid: user.uid,
             firstName: values.firstName,
@@ -119,7 +114,7 @@ function RegisterScreen() {
     console.log("START 3");
     const storageRef = ref(
       storage,
-      `images/${values.email}/profilePict/${fileName}`
+      `images/${values.email}/profilePict/${user.uid}`
     );
     console.log("START 4");
     const img = await fetch(image);

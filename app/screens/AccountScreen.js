@@ -94,7 +94,7 @@ function AccountScreen({ navigation }) {
     console.log("Retreving Profile Pict---------------------------");
     const reference = ref(
       storage,
-      `images/${auth.currentUser.email}/profilePict/${auth.currentUser.email}`
+      `images/profilePict/${auth.currentUser.uid}`
     );
 
     await getDownloadURL(reference).then((x) => {

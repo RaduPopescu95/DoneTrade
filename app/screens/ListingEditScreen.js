@@ -142,7 +142,7 @@ function ListingEditScreen() {
       const fileType = fileName.split(".").pop();
       const storageRef = ref(
         storage,
-        `images/${currentUserOnline.email}/posts/${fileName}`
+        `images/posts/${currentUserOnline.uid}&&${fileName}`
       );
       console.log("img...No");
       const img = await fetch(images[i]);
@@ -169,7 +169,7 @@ function ListingEditScreen() {
       collection(db, "Users"),
       where("owner_uid", "==", userId)
     );
-    const docUpdated = doc(db, "Users", currentUserOnline.email);
+    const docUpdated = doc(db, "Users", currentUserOnline.uid);
     const Titlu = values.title;
 
     if (values.images) {
@@ -179,7 +179,7 @@ function ListingEditScreen() {
     console.log("imageUrl...", imageUrl);
     // Add POSTS TO USER
     try {
-      const docRef = doc(db, "Users", currentUserOnline.email);
+      const docRef = doc(db, "Users", currentUserOnline.uid);
       const colRef = collection(docRef, "Posts");
       for (let i = 0; i < values.images.length; i++) {
         console.log("values images2...", values.images[i]);

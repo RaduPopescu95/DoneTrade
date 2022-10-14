@@ -6,7 +6,9 @@ import {
   Text,
   View,
   Image,
+  TextInput,
 } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 import Constants from "expo-constants";
 import { authentication, db, storage } from "../../firebase";
 // import { collection, query, where } from "firebase/firestore";
@@ -61,6 +63,9 @@ const handleNavigate = () => {
 
 function ListingsScreen({ navigation }) {
   const [listings, setListings] = useState([]);
+  const [searchedListings, setSearchedListings] = useState([]);
+  const [searched, setSearched] = useState([]);
+  const [keyw, setKeyw] = useState("");
   const [primite, setPrimite] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -69,6 +74,7 @@ function ListingsScreen({ navigation }) {
   const auth = authentication;
   const imageUri = "";
   const usersPosts = [];
+  let searchedPosts = [];
 
   const retrieveData = async () => {
     // GOOD FOR RETRIEVE ONE DOC
@@ -116,7 +122,7 @@ function ListingsScreen({ navigation }) {
         console.log(`img names...${z}`, usersPosts[i].img_names[z]);
         const reference = ref(
           storage,
-          `images/${usersPosts[i].user}/posts/${usersPosts[i].img_names[z]}`
+          `images/posts/${usersPosts[i].owner_uid}&&${usersPosts[i].img_names[z]}`
         );
 
         await getDownloadURL(reference).then((x) => {
@@ -146,18 +152,102 @@ function ListingsScreen({ navigation }) {
     // console.log("imgs urisss...", usersPosts[0].img_uri);
     // imageUri = usersPosts.img_uri[0];
     setListings(usersPosts);
+    setSearchedListings(usersPosts);
     setRefreshing(false);
+    console.log("test for search...", usersPosts[0].title);
   };
 
+  const handleSetKeyword = (key) => {
+    console.log("key...", key.toLowerCase());
+    let word = key.toLowerCase();
+    // let bedrooms = listings.filter((name) => console.log(name));
+    // console.log("title...", listings[0].title);
+    setKeyw(key);
+    for (let i = 0; i < listings.length; i++) {
+      let title = listings[i].title.toLowerCase();
+      console.log("title...", title.toLowerCase());
+      if (title.includes(word) && word.length > 0) {
+        console.log("good");
+        // console.log(searchedPosts);
+        // console.log(typeof listings);
+        searchedPosts.push(listings[i]);
+        // setSearched(searchedPosts);
+      } else if (!title.includes(word) && word.length > 0) {
+        console.log("not");
+        // searchedPosts = [];
+        // setSearched([]);
+        // setSearchedListings(listings);
+      } else {
+        console.log("yeap...");
+        // setKeyw(key);
+        setSearchedListings(listings);
+        return;
+      }
+    }
+    // if (searchedPosts > 0) {
+    // console.log("Asdadssdas");
+    setSearchedListings(searchedPosts);
+    // } else setSearchedListings(listings);
+    // setKeyw(key);
+    // // if (key.length === 0) {
+    // //   retrieveData();
+    // // }
+    // if (listings && listings[0].title.includes(key)) {
+    //   console.log("good");
+    //   setListings(listings[0]);
+    // } else console.log("not");
+    // // setKeyw(key);
+  };
   useEffect(() => {
     console.log("USE EFFECTT FOR LISTINGS.................................");
-    retrieveData();
-    // console.log("listings...here", listings[2].img_uri[0]);
+    console.log("length...", keyw.length);
+    if (keyw.length === 0) {
+      retrieveData();
+    }
+    console.log("listings...here", keyw);
   }, []);
-
+  let startHeaderHeight = 80;
   return (
     <>
-      <View style={styles.searchContainer}></View>
+      <View style={styles.searchContainer}>
+        {/* <SearchBox keyword={setKeyword} /> */}
+        <View
+          style={{
+            height: startHeaderHeight,
+            backgroundColor: colors.light,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.light,
+            height: 50,
+            marginBottom: 10,
+            width: "90%",
+            alignSelf: "center",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              padding: 10,
+              backgroundColor: "white",
+              marginHorizontal: 0,
+              shadowOffset: { width: 0, height: 0 },
+              shadowColor: "black",
+              shadowOpacity: 0.2,
+              elevation: 1,
+              marginTop: Platform.OS == "android" ? 10 : null,
+              width: "100%",
+            }}
+          >
+            <Icon name="ios-search" size={20} style={{ marginRight: 10 }} />
+            <TextInput
+              underlineColorAndroid="transparent"
+              placeholder="What are you looking for?"
+              placeholderTextColor="grey"
+              style={{ flex: 1, fontWeight: "700", backgroundColor: "white" }}
+              onChangeText={(text) => handleSetKeyword(text)}
+            />
+          </View>
+        </View>
+      </View>
       <Screen style={styles.screen}>
         {/* <Category /> */}
         <Loader visible={loading} />
@@ -165,7 +255,7 @@ function ListingsScreen({ navigation }) {
         {/* <ActivityIndicator animating={loading} size="large" /> */}
         {/* <Loader visible={loading} /> */}
         <FlatList
-          data={listings}
+          data={searchedListings}
           keyExtractor={(listing) => listing.key.toString()}
           showsVerticalScrollIndicator={false}
           style={styles.listingsStyle}

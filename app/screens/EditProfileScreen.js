@@ -23,7 +23,15 @@ import {
   deleteObject,
 } from "firebase/storage";
 
-import { setDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
+import {
+  setDoc,
+  doc,
+  getDoc,
+  deleteDoc,
+  collectionGroup,
+  getDocs,
+  query,
+} from "firebase/firestore";
 import {
   ListItem,
   ListItemDeleteAction,
@@ -123,10 +131,7 @@ function EditProfileScreen({ route }) {
     console.log(fileName);
     const fileType = fileName.split(".").pop();
     console.log("START 3");
-    const storageRef = ref(
-      storage,
-      `images/${values.email}/profilePict/${values.email}`
-    );
+    const storageRef = ref(storage, `images/profilePict/${values.email}`);
     console.log("START 4");
     const img = await fetch(values.profilePict);
     console.log("START 5");
@@ -206,17 +211,15 @@ function EditProfileScreen({ route }) {
   // const admin = require("firebase-admin");
 
   const handleFinalDelete = async () => {
-    console.log("...curentuser", auth.currentUser.email);
+    console.log("...curentuser", auth.currentUser.uid);
 
     // // Delete the file (REMEMBER TO ADD DELETE ALL IMG POSTS WHEN DELETTING USER)
     const desertRef = ref(
       storage,
-      `images/${auth.currentUser.email}/profilePict/${auth.currentUser.email}`
+      `images/profilePict/${auth.currentUser.uid}`
     );
-    // console.log("desertRef", desertRef);
-    // await bucket.deleteFiles({
-    //   prefix: "images/users/${uid}", // the path of the folder
-    // });
+    console.log("desertRef", desertRef);
+
     deleteObject(desertRef)
       .then(() => {
         // File deleted successfully
@@ -226,11 +229,37 @@ function EditProfileScreen({ route }) {
         console.log("error deleting file...", error);
         // Uh-oh, an error occurred!
       });
+
     // // Delete doc
-    await deleteDoc(doc(db, "Users", auth.currentUser.email));
+    const usersPosts = [];
+    const posts = query(collectionGroup(db, "Posts"));
+    const querySnapshot = await getDocs(posts);
+    console.log("start1...");
+    querySnapshot.forEach((doc) => {
+      // console.log(usersPosts.length);
+      console.log("start2...");
+      if (doc.data().user === auth.currentUser.email) {
+        console.log("start3...");
+        // console.log("yes");
+        // console.log("curent user...", auth.currentUser.email);
+        usersPosts.push({ ...doc.data(), key: doc.id });
+        console.log("start4...");
+      }
+      // console.log(usersPosts.length);
+      console.log("start5...");
+    });
+    for (let i = 0; i < usersPosts.length; i++) {
+      await deleteDoc(
+        doc(db, "Users", auth.currentUser.uid, "Posts", usersPosts[i].key)
+      );
+      console.log("startI...", usersPosts[i].key);
+    }
+    console.log("start6...");
+    await deleteDoc(doc(db, "Users", auth.currentUser.uid));
+    console.log("start7...");
 
     //Delete user from authentication
-    console.log("deletting...", auth.currentUser.email);
+    console.log("deletting...", auth.currentUser.uid);
     auth.currentUser
       .delete()
       .then(() => console.log("User deleted"))
@@ -257,8 +286,8 @@ function EditProfileScreen({ route }) {
   };
 
   const retrieveData = async () => {
-    console.log("test1");
-    const docRef = doc(db, "Users", auth.currentUser.email);
+    console.log("test1", auth.currentUser);
+    const docRef = doc(db, "Users", auth.currentUser.uid);
     console.log("test2");
     console.log(docRef);
     console.log("test3");
@@ -274,7 +303,7 @@ function EditProfileScreen({ route }) {
 
     const reference = ref(
       storage,
-      `images/${auth.currentUser.email}/profilePict/${auth.currentUser.email}`
+      `images/profilePict/${auth.currentUser.uid}`
     );
 
     await getDownloadURL(reference).then((x) => {
