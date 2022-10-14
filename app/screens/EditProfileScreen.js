@@ -14,13 +14,16 @@ import {
 } from "react-native";
 import * as Yup from "yup";
 import { authentication, db, storage } from "../../firebase";
+import { getAuth, deleteUser } from "firebase/auth";
 import {
   ref,
   uploadBytes,
   uploadBytesResumable,
   getDownloadURL,
+  deleteObject,
 } from "firebase/storage";
-import { setDoc, doc, getDoc } from "firebase/firestore";
+
+import { setDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import {
   ListItem,
   ListItemDeleteAction,
@@ -59,41 +62,53 @@ const validationSchema = Yup.object().shape({
     .label("profilePict"),
 });
 
-function EditProfileScreen() {
+function EditProfileScreen({ route }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [profileImg, setProfileImg] = useState([]);
   const [userDetails, setUserDetails] = useState({});
   const [uploadVisible, setUploadVisible] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [modalVisible, setModalVisible] = useState(true);
+  const [deleteAccount, setDeleteAccount] = useState(false);
+  const [currentUserOnline, setCurrentUserOnline] = useState("");
   const navigation = useNavigation();
   const auth = authentication;
+  const details = route.params;
 
   const options = [
     {
       id: 1,
       title: "First name",
       subtitle: userDetails.firstName,
+      firebaseParam: "firstName",
+      initialValue: "firstName",
     },
     {
       id: 2,
       title: "Second name",
       subtitle: userDetails.lastName,
+      firebaseParam: "lastName",
+      initialValue: "lastName",
     },
     {
       id: 3,
       title: "Email",
       subtitle: userDetails.email,
+      firebaseParam: "email",
+      initialValue: "email",
     },
     {
       id: 4,
       title: "Phone number",
       subtitle: userDetails.phoneNumber,
+      firebaseParam: "phoneNumber",
+      initialValue: "phoneNumber",
     },
     {
       id: 5,
       title: "Change password",
       // subtitle: userDetails.phoneNumber,
+      initialValue: "password",
     },
   ];
 
@@ -186,6 +201,61 @@ function EditProfileScreen() {
     //  navigation.goBack();
   };
 
+  // // // The Firebase Admin SDK to access Firestore.
+  // const functions = require("firebase-functions");
+  // const admin = require("firebase-admin");
+
+  const handleFinalDelete = async () => {
+    console.log("...curentuser", auth.currentUser.email);
+
+    // // Delete the file (REMEMBER TO ADD DELETE ALL IMG POSTS WHEN DELETTING USER)
+    const desertRef = ref(
+      storage,
+      `images/${auth.currentUser.email}/profilePict/${auth.currentUser.email}`
+    );
+    // console.log("desertRef", desertRef);
+    // await bucket.deleteFiles({
+    //   prefix: "images/users/${uid}", // the path of the folder
+    // });
+    deleteObject(desertRef)
+      .then(() => {
+        // File deleted successfully
+        console.log("deleted file...");
+      })
+      .catch((error) => {
+        console.log("error deleting file...", error);
+        // Uh-oh, an error occurred!
+      });
+    // // Delete doc
+    await deleteDoc(doc(db, "Users", auth.currentUser.email));
+
+    //Delete user from authentication
+    console.log("deletting...", auth.currentUser.email);
+    auth.currentUser
+      .delete()
+      .then(() => console.log("User deleted"))
+      .catch((error) => console.log(error));
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Are you sure you want to delete your account?",
+      "After deletting your account you will not be able to retrieve your account and listings and you will have to create a new account.",
+      [
+        {
+          text: "Delete account",
+          onPress: () => handleFinalDelete(),
+          style: "cancel",
+        },
+        {
+          text: "Keep account",
+          onPress: () => console.log("keep account"),
+          style: "cancel",
+        },
+      ]
+    );
+  };
+
   const retrieveData = async () => {
     console.log("test1");
     const docRef = doc(db, "Users", auth.currentUser.email);
@@ -270,9 +340,10 @@ function EditProfileScreen() {
   };
 
   useEffect(() => {
+    setCurrentUserOnline(auth.currentUser);
     console.log("registerUseEffect.....", auth.currentUser);
     retrieveData();
-  }, []);
+  }, [details]);
 
   return (
     <>
@@ -363,7 +434,7 @@ function EditProfileScreen() {
           <TouchableOpacity
             // style={[styles.button, { backgroundColor: colors[color] }]}
             style={styles.button}
-            // onPress={onPress}
+            onPress={handleDeleteAccount}
           >
             <Text style={styles.text}>Delete account</Text>
           </TouchableOpacity>
