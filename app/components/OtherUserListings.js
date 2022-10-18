@@ -14,8 +14,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
-// import Category from "./components/Explore/Category";
-import Category from "./Category";
+// import HorizontalListings from "./components/Explore/HorizontalListings";
+import HorizontalListings from "./lists/HorizontalListings";
 import { useState } from "react";
 import colors from "../config/colors";
 
@@ -48,7 +48,7 @@ export default function OtherUserListings({ usersListings, focusedListing }) {
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           {usersListings.map((listing) =>
             listing.key === keyFocused ? (
-              <Category
+              <HorizontalListings
                 keyStyle={colors.dark}
                 keyBorderWidth={1.5}
                 key={listing.key}
@@ -61,7 +61,7 @@ export default function OtherUserListings({ usersListings, focusedListing }) {
               />
             ) : (
               // <Text key={listing.key}>{listing.title}</Text>
-              <Category
+              <HorizontalListings
                 key={listing.key}
                 imageUri={{ uri: listing.img_uri[0] }}
                 name={listing.title}
