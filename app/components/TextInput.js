@@ -3,14 +3,19 @@ import { View, TextInput, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import defaultStyles from "../config/styles";
+import { useFormikContext } from "formik";
 
 function AppTextInput({
   icon,
   width = "100%",
   bgColorContactSeller,
   defaultValue,
+  value,
+  name,
+  changeVal,
   ...otherProps
 }) {
+  const { setFieldTouched, handleChange, errors, touched } = useFormikContext();
   return (
     <View style={[styles.container, { width }]}>
       {icon && (
@@ -25,6 +30,8 @@ function AppTextInput({
         placeholderTextColor={defaultStyles.colors.medium}
         defaultValue={defaultValue}
         // style={defaultStyles.text}
+        // changeVal={changeVal}
+        value={value}
         style={[defaultStyles.text, { backgroundColor: bgColorContactSeller }]}
         {...otherProps}
       />

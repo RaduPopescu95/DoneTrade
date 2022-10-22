@@ -6,6 +6,7 @@ import {
   Text,
   View,
   Image,
+  Alert,
 } from "react-native";
 import { authentication, db, storage } from "../../firebase";
 // import { collection, query, where } from "firebase/firestore";
@@ -17,6 +18,7 @@ import {
   query,
   where,
   collectionGroup,
+  deleteDoc,
 } from "firebase/firestore";
 
 import Card from "../components/Card";
@@ -26,7 +28,13 @@ import routes from "../navigation/routes";
 import { useState } from "react/cjs/react.development";
 import LinkList from "react-native/Libraries/NewAppScreen/components/LearnMoreLinks";
 import Loader from "../components/Loader";
-import { ref, getDownloadURL, listAll, child } from "firebase/storage";
+import {
+  ref,
+  getDownloadURL,
+  listAll,
+  child,
+  deleteObject,
+} from "firebase/storage";
 import {
   ListItem,
   ListItemDeleteAction,
@@ -44,9 +52,70 @@ function UserListingsScreen({ navigation }) {
   const [primite, setPrimite] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [deleted, setDeleted] = useState(true);
   const [url, setUrl] = useState();
   const [currentUserOnline, setCurrentUserOnline] = useState("");
   const auth = authentication;
+
+  const handleDelete = (item) => {
+    Alert.alert(
+      "Are you sure you want to delete this listing?",
+      "After deletting your listing you will not be able to retrieve it!",
+      [
+        {
+          text: "Delete listing",
+          onPress: () => handleFinalDelete(item),
+          // onPress: () => console.log("the item...", item),
+          style: "cancel",
+        },
+        {
+          text: "Keep listing",
+          onPress: () => console.log("keep listing"),
+          style: "cancel",
+        },
+      ]
+    );
+  };
+
+  const handleFinalDelete = async (item) => {
+    console.log("...curentuser", auth.currentUser.uid);
+    // console.log("...item...key", item);
+    // // Delete the file (REMEMBER TO ADD DELETE ALL IMG POSTS WHEN DELETTING USER)
+    for (let i = 0; i < item.img_names.length; i++) {
+      console.log(`${i}...items`, item.img_names[i]);
+      const desertRef = ref(
+        storage,
+        `images/posts/${auth.currentUser.uid}&&${item.img_names[i]}`
+      );
+      deleteObject(desertRef)
+        .then(() => {
+          // File deleted successfully
+          console.log("deleted file...");
+        })
+        .catch((error) => {
+          console.log("error deleting file...", error);
+          // Uh-oh, an error occurred!
+        });
+    }
+
+    // Delete the post
+    // const usersPosts = [];
+    // const posts = query(collectionGroup(db, "Posts"));
+    // const querySnapshot = await getDocs(posts);
+    // querySnapshot.forEach((doc) => {
+    //   if (doc.data().user === auth.currentUser.email) {
+    //     usersPosts.push({ ...doc.data(), key: doc.id });
+    //   }
+    // });
+    try {
+      await deleteDoc(
+        doc(db, "Users", auth.currentUser.uid, "Posts", item.key)
+      );
+    } catch (err) {
+      console.log("error on deletting the post from database...", errr);
+    }
+    setDeleted(!deleted);
+  };
 
   const retrieveData = async () => {
     //GOOD FOR GETTING SUB COLLECTION
@@ -107,7 +176,7 @@ function UserListingsScreen({ navigation }) {
     console.log("USE EFFECTT FOR LISTINGS.................................");
     retrieveData();
     console.log("listings for user...", listings);
-  }, []);
+  }, [deleted]);
 
   return (
     <Screen>

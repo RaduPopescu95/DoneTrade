@@ -9,9 +9,17 @@ function AppFormField({
   width,
   bgColorContactSeller,
   defaultValue,
+  value,
+  changeVal,
   ...otherProps
 }) {
-  const { setFieldTouched, handleChange, errors, touched } = useFormikContext();
+  const { setFieldTouched, handleChange, errors, touched, values } =
+    useFormikContext();
+
+  const handleChangeText = () => {
+    handleChange(name);
+    handleChange(value);
+  };
 
   return (
     <>
@@ -21,6 +29,29 @@ function AppFormField({
         width={width}
         bgColorContactSeller={bgColorContactSeller}
         defaultValue={defaultValue}
+        name={name}
+        value={
+          name === "title"
+            ? values.title
+            : name === "description"
+            ? values.description
+            : name === "price"
+            ? values.price
+            : name === "firstName"
+            ? values.firstName
+            : name === "lastName"
+            ? values.lastName
+            : name === "email"
+            ? values.email
+            : name === "phoneNumber"
+            ? values.phoneNumber
+            : name === "password"
+            ? values.password
+            : name === "confirmPassword"
+            ? values.confirmPassword
+            : "none"
+        }
+        changeVal={changeVal}
         {...otherProps}
       />
       <ErrorMessage error={errors[name]} visible={touched[name]} />

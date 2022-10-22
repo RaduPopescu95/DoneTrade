@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Image, Button, Alert } from "react-native";
+import {
+  StyleSheet,
+  Image,
+  Button,
+  Alert,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import * as Yup from "yup";
 
 import Screen from "../components/Screen";
@@ -120,16 +127,32 @@ function LoginScreen(props) {
           textContentType="password"
         />
         <SubmitButton title="Login" />
-        <Button
-          title="Register"
+        <TouchableOpacity
+          style={styles.button}
           onPress={() => navigation.navigate("RegisterScreen")}
-        />
+        >
+          <Text style={styles.text}>Register for an account</Text>
+        </TouchableOpacity>
       </Form>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "transparent",
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 5,
+    width: "100%",
+    // marginVertical: 0,
+  },
+  text: {
+    color: colors.dark,
+    fontSize: 15,
+    textDecorationLine: "underline",
+  },
   container: {
     padding: 10,
     backgroundColor: colors.light,

@@ -12,16 +12,24 @@ import { useFormikContext } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../../config/colors";
-import { TouchableHighlight } from "react-native-gesture-handler";
+import { authentication, db, storage } from "../../../firebase";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 
-export default function ProfilePictPicker({
+export default function ProfilePictEdit({
   onSelectProfileUri,
   name,
   img,
   profileImage,
+  newImg,
 }) {
   const [image, setImage] = useState(null);
   const { errors, setFieldValue, touched, values } = useFormikContext();
+  const auth = authentication;
 
   const requestPermision = async () => {
     const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -36,28 +44,63 @@ export default function ProfilePictPicker({
       quality: 1,
     });
 
-    if (!_image.cancelled) {
-      setImage(_image.uri);
-    }
-
-    console.log("IMAGE......", _image.uri);
-
-    setFieldValue(name, _image.uri);
+    Alert.alert(
+      "Profile image change",
+      "Are you sure you want to change your profile picture?",
+      [
+        // {
+        //   text: "Choose another image",
+        //   onPress: () => addImage(),
+        // },
+        {
+          text: "Keep profile picture",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Change profile picture",
+          onPress: () => handleUploadImg(_image),
+        },
+      ]
+    );
   };
 
-  const createThreeButtonAlert = () =>
-    Alert.alert("Alert Title", "My Alert Msg", [
-      {
-        text: "Ask me later",
-        onPress: () => console.log("Ask me later pressed"),
-      },
-      {
-        text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel",
-      },
-      { text: "OK", onPress: () => console.log("OK Pressed") },
-    ]);
+  const handleUploadImg = async (img) => {
+    if (!img.cancelled) {
+      setImage(img.uri);
+    }
+
+    console.log("IMAGE......", img.uri);
+
+    // setFieldValue(name, img.uri);
+
+    const desertRef = ref(
+      storage,
+      `images/profilePict/${auth.currentUser.uid}`
+    );
+    deleteObject(desertRef)
+      .then(() => {
+        // File deleted successfully
+        console.log("deleted file...");
+      })
+      .catch((error) => {
+        console.log("error deleting file...", error);
+        // Uh-oh, an error occurred!
+      });
+
+    console.log("...curentuser", auth.currentUser.uid);
+    const storageRef = ref(
+      storage,
+      `images/profilePict/${auth.currentUser.uid}`
+    );
+
+    const image = await fetch(img.uri);
+
+    const bytes = await image.blob();
+
+    await uploadBytes(storageRef, bytes);
+    newImg(img.uri);
+  };
 
   useEffect(() => {
     requestPermision();

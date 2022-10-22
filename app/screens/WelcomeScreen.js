@@ -6,12 +6,14 @@ import {
   Image,
   Text,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 
 import { authentication } from "../../firebase";
 
 import Button from "../components/Button";
 import Loader from "../components/Loader";
+import colors from "../config/colors";
 
 function WelcomeScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -53,11 +55,12 @@ function WelcomeScreen({ navigation }) {
             color="secondary"
             onPress={() => navigation.navigate("RegisterScreen")}
           />
-          <Button
-            title="Continue as guest"
-            color="secondary"
+          <TouchableOpacity
+            style={styles.button}
             onPress={() => navigation.navigate("AppNavigator")}
-          />
+          >
+            <Text style={styles.text}>Continue as guest</Text>
+          </TouchableOpacity>
         </View>
       )}
     </ImageBackground>
@@ -65,6 +68,20 @@ function WelcomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "transparent",
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 0,
+    width: "100%",
+    marginVertical: 0,
+  },
+  text: {
+    color: colors.dark,
+    fontSize: 15,
+    textDecorationLine: "underline",
+  },
   background: {
     flex: 1,
     justifyContent: "flex-end",

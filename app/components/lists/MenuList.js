@@ -19,11 +19,6 @@ export default function MenuList({ item, handlePress }) {
         style={[styles.card, { backgroundColor: item.color }]}
         onPress={handlePress}
       >
-        {/* <Image
-                    style={styles.cardImage}
-                    source={{ uri: item.image }}
-                  /> */}
-
         <MaterialCommunityIcons
           name={item.icon.name}
           color={colors.primary}
@@ -48,12 +43,6 @@ export default function MenuList({ item, handlePress }) {
 }
 
 const styles = StyleSheet.create({
-  // screen: {
-  //   backgroundColor: colors.light,
-  // },
-  // container: {
-  //   marginVertical: 20,
-  // },
   containerMenu: {
     flex: 1,
     marginTop: 65,

@@ -3,6 +3,7 @@ import { StyleSheet, Alert } from "react-native";
 import * as Yup from "yup";
 import useLocation from "../hooks/useLocation";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
+import { useIsFocused } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
 
 import {
@@ -108,11 +109,13 @@ function ListingEditScreen() {
   const [uploadVisible, setUploadVisible] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fileNames, setFileNames] = useState([]);
+  const [val, setVal] = useState("ss");
   const location = useLocation();
   const navigation = useNavigation();
   const auth = authentication;
   const allInputs = { imgUrl: "" };
   const fileNamesArray = [];
+  const isFocused = useIsFocused();
 
   // const db = firebase.firestore
 
@@ -132,7 +135,7 @@ function ListingEditScreen() {
         setUserId(user.uid);
       } else setSignedIn(false);
     });
-  }, []);
+  }, [isFocused]);
 
   const uploadImage = async (images) => {
     setLoading(true);
@@ -223,6 +226,7 @@ function ListingEditScreen() {
     } catch (err) {
       console.log("Could not save the listing", err);
     }
+    resetForm();
   };
 
   return (
@@ -243,7 +247,13 @@ function ListingEditScreen() {
         validationSchema={validationSchema}
       >
         <FormImagePicker name="images" />
-        <FormField maxLength={255} name="title" placeholder="Title" />
+        <FormField
+          maxLength={255}
+          name="title"
+          placeholder="Title"
+          value={val}
+          changeVal={setVal}
+        />
         <FormField
           keyboardType="numeric"
           maxLength={8}
@@ -266,6 +276,8 @@ function ListingEditScreen() {
           name="description"
           numberOfLines={3}
           placeholder="Description"
+          value={val}
+          changeVal={setVal}
         />
         <SubmitButton title="Post" />
       </Form>

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Button, Alert, TextInput, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Button,
+  Alert,
+  TextInput,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Yup from "yup";
 import { authentication, db, storage } from "../../firebase";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
@@ -132,75 +141,87 @@ function RegisterScreen() {
     console.log("registerUseEffect.....");
   }, []);
   return (
-    <ScrollView style={styles.container}>
-      <UploadScreen visible={uploadVisible} />
-      <Form
-        initialValues={{
-          firstName: "",
-          lastName: "",
-          email: "",
-          password: "",
-          profilePict: [],
-        }}
-        onSubmit={handleSignUp}
-        validationSchema={validationSchema}
-      >
-        <ProfilePictPicker name="profilePict" />
-        <FormField
-          autoCorrect={false}
-          icon="account"
-          name="firstName"
-          placeholder="First name"
-        />
-        <FormField
-          autoCorrect={false}
-          icon="account"
-          name="lastName"
-          placeholder="Last name"
-        />
-        <FormField
-          autoCapitalize="none"
-          autoCorrect={false}
-          icon="email"
-          keyboardType="email-address"
-          name="email"
-          placeholder="Email"
-          textContentType="emailAddress"
-        />
-        <FormField
-          autoCapitalize="none"
-          autoCorrect={false}
-          icon="email"
-          keyboardType="number"
-          name="phoneNumber"
-          placeholder="Phone Number"
-          textContentType="emailAddress"
-        />
-        <FormField
-          autoCapitalize="none"
-          autoCorrect={false}
-          icon="lock"
-          name="password"
-          placeholder="Password"
-          secureTextEntry
-          textContentType="password"
-        />
-        <FormField
-          autoCapitalize="none"
-          autoCorrect={false}
-          icon="lock"
-          name="confirmPassword"
-          placeholder="Confirm password"
-          secureTextEntry
-          textContentType="password"
-        />
-        <SubmitButton title="Register" />
-        <Button
-          title="Login"
-          onPress={() => navigation.navigate("LoginScreen")}
-        />
-      </Form>
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView>
+        <UploadScreen visible={uploadVisible} />
+        <Form
+          initialValues={{
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+            profilePict: [],
+          }}
+          onSubmit={handleSignUp}
+          validationSchema={validationSchema}
+        >
+          <ProfilePictPicker name="profilePict" />
+          <FormField
+            autoCorrect={false}
+            icon="account"
+            name="firstName"
+            placeholder="First name"
+          />
+          <FormField
+            autoCorrect={false}
+            icon="account"
+            name="lastName"
+            placeholder="Last name"
+          />
+          <FormField
+            autoCapitalize="none"
+            autoCorrect={false}
+            icon="email"
+            keyboardType="email-address"
+            name="email"
+            placeholder="Email"
+            textContentType="emailAddress"
+          />
+          <FormField
+            autoCapitalize="none"
+            autoCorrect={false}
+            icon="email"
+            keyboardType="number"
+            name="phoneNumber"
+            placeholder="Phone Number"
+            textContentType="emailAddress"
+          />
+          <FormField
+            autoCapitalize="none"
+            autoCorrect={false}
+            icon="lock"
+            name="password"
+            placeholder="Password"
+            secureTextEntry
+            textContentType="password"
+          />
+          <FormField
+            autoCapitalize="none"
+            autoCorrect={false}
+            icon="lock"
+            name="confirmPassword"
+            placeholder="Confirm password"
+            secureTextEntry
+            textContentType="password"
+          />
+          <SubmitButton title="Register" />
+          <View
+            style={{
+              flexDirection: "row",
+              alignSelf: "center",
+            }}
+          >
+            <Text>Already have an account?</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("LoginScreen")}
+            >
+              <Text style={styles.text}>Click here</Text>
+            </TouchableOpacity>
+          </View>
+        </Form>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -208,8 +229,26 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: colors.light,
-    flex: 1,
+    // flex: 1,
+
     paddingTop: Constants.statusBarHeight,
+    // paddingBottom: 30,
+    height: "100%",
+  },
+  button: {
+    backgroundColor: "transparent",
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 5,
+    // padding: 5,
+    // width: "100%",
+    // marginVertical: 0,
+  },
+  text: {
+    color: colors.dark,
+    fontSize: 15,
+    textDecorationLine: "underline",
   },
 });
 

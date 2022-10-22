@@ -10,7 +10,7 @@ import ListingEditScreen from "../screens/ListingEditScreen";
 import ListingsScreen from "../screens/ListingsScreen";
 import AccountNavigator from "./AccountNavigator";
 import FeedNavigator from "./FeedNavigator";
-import NewListingIcon from "./NewListingIcon";
+// import NewListingIcon from "./NewListingIcon";
 import LoginScreen from "../screens/LoginScreen";
 import { authentication } from "../../firebase";
 import { useState } from "react/cjs/react.development";
@@ -60,7 +60,7 @@ const AppNavigator = () => {
         component={FeedNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
+            <MaterialCommunityIcons name="home" color={color} size={35} />
           ),
         }}
       />
@@ -70,16 +70,11 @@ const AppNavigator = () => {
           name="ListingsEdit"
           component={ListingEditScreen}
           options={({ navigation }) => ({
-            tabBarButton: () => (
-              <NewListingIcon
-                onPress={() => navigation.navigate("ListingsEdit")}
-              />
-            ),
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="plus-circle"
                 color={color}
-                size={size}
+                size={35}
               />
             ),
           })}
@@ -90,7 +85,7 @@ const AppNavigator = () => {
         component={AccountNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" color={color} size={size} />
+            <MaterialCommunityIcons name="account" color={color} size={35} />
           ),
         }}
       />
