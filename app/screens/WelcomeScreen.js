@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 import { authentication } from "../../firebase";
 
@@ -18,6 +19,7 @@ import colors from "../config/colors";
 function WelcomeScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const auth = authentication;
+  const isFocused = useIsFocused();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -25,7 +27,7 @@ function WelcomeScreen({ navigation }) {
       } else setIsLoading(false);
     });
     return unsubscribe;
-  }, []);
+  }, [isFocused]);
 
   return (
     <ImageBackground

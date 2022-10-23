@@ -160,7 +160,7 @@ function ListingsScreen({ navigation }) {
     // setSearchedListings(usersPosts);
     setFinalListings(usersPosts);
     fnlListings = usersPosts;
-    handleCategorySelection({ label: "none" });
+    // handleCategorySelection({ label: "none" });
     setRefreshing(false);
     console.log("test for search...", usersPosts[0].title);
   };

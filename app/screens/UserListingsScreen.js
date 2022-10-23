@@ -111,6 +111,7 @@ function UserListingsScreen({ navigation }) {
       await deleteDoc(
         doc(db, "Users", auth.currentUser.uid, "Posts", item.key)
       );
+      console.log("success delete from database!");
     } catch (err) {
       console.log("error on deletting the post from database...", errr);
     }

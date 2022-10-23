@@ -135,7 +135,6 @@ function ProfileEditor({
             onPress: () => {
               signOut(auth)
                 .then((re) => {
-                  setIsSignedIn(false);
                   console.log("signedOut");
                   navigation.replace("LoginScreen");
                 })
