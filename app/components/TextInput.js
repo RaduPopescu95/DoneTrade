@@ -15,7 +15,6 @@ function AppTextInput({
   changeVal,
   ...otherProps
 }) {
-  const { setFieldTouched, handleChange, errors, touched } = useFormikContext();
   return (
     <View style={[styles.container, { width }]}>
       {icon && (
@@ -29,8 +28,6 @@ function AppTextInput({
       <TextInput
         placeholderTextColor={defaultStyles.colors.medium}
         defaultValue={defaultValue}
-        // style={defaultStyles.text}
-        // changeVal={changeVal}
         value={value}
         style={[defaultStyles.text, { backgroundColor: bgColorContactSeller }]}
         {...otherProps}

@@ -4,121 +4,61 @@ import {
   View,
   Image,
   StyleSheet,
-  KeyboardAvoidingView,
-  Button,
   TouchableOpacity,
   Text,
   Animated,
-  Easing,
   Platform,
-  TextInput,
   TouchableHighlight,
-  Alert,
-  FlatList,
   Linking,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { sendSignInLinkToEmail, signOut } from "firebase/auth";
 import { authentication, db, storage } from "../../firebase";
 import { ref, getDownloadURL, list } from "firebase/storage";
 import {
   doc,
   getDoc,
   getDocs,
-  collection,
   query,
-  where,
   collectionGroup,
 } from "firebase/firestore";
 
 import colors from "../config/colors";
-import ListItem from "../components/lists/ListItem";
-// import Text from "../components/Text";
-import ContactSellerForm from "../components/ContactSellerForm";
-import ImageInput from "../components/ImageInput";
 import OtherUserListings from "../components/OtherUserListings";
 
 function ListingDetailsScreen({ route }) {
-  const [isSignedIn, setIsSignedIn] = useState(false);
   const [profilePicture, setProfilePicture] = useState("");
   const [firstName, setFirstName] = useState("firstName");
   const [lastName, setLastName] = useState("SecondName");
-  const [email, setEmail] = useState("email");
-  const [contact, setContacted] = useState(false);
   const [isPresentUser, setIsPresentUser] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [usersListings, setUserListings] = useState([]);
-  const [value] = useState(new Animated.Value(0));
   const auth = authentication;
-  const userNow = {};
 
   const listing = route.params;
 
   const retrieveData = async () => {
-    // GOOD FOR RETRIEVE ONE DOC
-    // console.log("test1");
-    console.log("listing user...", listing.owner_uid);
     const docRef = doc(db, "Users", listing.owner_uid);
-    // console.log("DOCREF...", docRef);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      // console.log("Document data:....", docSnap.data());
       setFirstName(docSnap.data().firstName);
       setLastName(docSnap.data().lastName);
-      setEmail(docSnap.data().email);
     } else {
-      // doc.data() will be undefined in this case
       console.log("No such document!");
     }
-
-    // console.log("test1");
-    // const docRef = doc(db, "Users", auth.currentUser.email);
-    // console.log(docRef);
-    // const docSnap = await getDoc(docRef);
-    // if (docSnap.exists()) {
-    //   // console.log("Document data:", docSnap.data());
-    //   setEmail(docSnap.data().email);
-    //   setFirstName(docSnap.data().firstName);
-    //   setLastName(docSnap.data().lastName);
-    // } else {
-    //   // doc.data() will be undefined in this case
-    //   console.log("No such document!");
-    // }
-    // console.log("Retreving Profile Pict---------------------------");
     if (auth.currentUser.email === listing.user) {
-      // console.log("present user...", listing.user);
       setIsPresentUser(true);
     }
     const reference = ref(storage, `images/profilePict/${listing.owner_uid}`);
     await getDownloadURL(reference).then((x) => {
       setProfilePicture(x);
     });
-
-    // setLoading(false);
-    // setRefreshing(false);
-    // setListings(usersPosts);
-    console.log(
-      "Retreving data Listings For the user---------------------------"
-    );
-    // setLoading(true);
     const usersPosts = [];
-    // const usersEmailImgName = [];
     const posts = query(collectionGroup(db, "Posts"));
     const querySnapshot = await getDocs(posts);
-    // console.log("query...", querySnapshot);
     querySnapshot.forEach((doc) => {
-      // console.log("doc.data...", doc.data().user);
-      // console.log(usersPosts.length);
       if (listing.user === doc.data().user) {
-        // console.log("test here...", doc.data().user);
         usersPosts.push({ ...doc.data(), key: doc.id });
       }
-      // console.log("length of usersposts...", usersPosts.length);
     });
-    // console.log("usersposts...", usersPosts);
-    // console.log("all users posts...", usersPosts);
-    console.log("start 1 FOR SETTINGS USERS POSTS");
-    // const newListings = [...usersListings];
     for (let i = 0; i < usersPosts.length; i++) {
       const img_uri = [];
       for (let z = 0; z < usersPosts[i].img_names.length; z++) {
@@ -128,46 +68,16 @@ function ListingDetailsScreen({ route }) {
           `images/posts/${usersPosts[i].owner_uid}&&${usersPosts[i].img_names[z]}`
         );
         await getDownloadURL(reference).then((x) => {
-          // console.log(usersPosts[i]);
-          console.log("xxx", x);
           img_uri.push(x);
-
-          // setUrl(x);
-          // newListings.forEach((element) => {
-          //   element.img_uri = x;
-          // });
         });
       }
       usersPosts[i].img_uri = [...img_uri];
       usersPosts[i].first_img_uri = img_uri[0];
-      console.log("firstimageuri...", usersPosts[i].first_img_uri);
-      // usersEmailImgName.push({
-      //   email: usersPosts[i].user,
-      //   post_img: usersPosts[i].img_names[0],
-      // });
     }
-    console.log("final users...posts.1..", usersPosts);
     setUserListings(usersPosts);
   };
 
-  const opacity = useRef(new Animated.Value(0)).current;
-
-  const saveButtonOpacity = opacity.interpolate({
-    inputRange: [0, 0.8, 1],
-    outputRange: [0, 0, 1],
-  });
   const dialContact = () => {
-    // setContacted(true);
-    // if (!isEditing) {
-    //   setIsEditing(true);
-    // } else {
-    //   setIsEditing(false);
-    // }
-    // Animated.timing(opacity, {
-    //   toValue: isEditing ? 1 : 0,
-    //   duration: 400,
-    //   useNativeDriver: true,
-    // }).start();
     let number = "";
     if (Platform.OS === "ios") {
       number = "telprompt:${091123456789}";
@@ -176,55 +86,21 @@ function ListingDetailsScreen({ route }) {
       console.log("ANDROID...");
       number = "tel:${091123456789}";
     }
-    // Linking.openURL(number);
     Linking.openURL(number);
-  };
-  const saveButtonTranslationX = opacity.interpolate({
-    inputRange: [0, 1],
-    outputRange: [100, 0],
-  });
-
-  const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
-
-  const product = {
-    name: "Lorem ipsum dolor sit amet",
-    description:
-      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
-    created: "",
-    images: [
-      "https://bootdey.com/img/Content/avatar/avatar6.png",
-      "https://bootdey.com/img/Content/avatar/avatar2.png",
-      "https://bootdey.com/img/Content/avatar/avatar3.png",
-    ],
-    colors: ["#00BFFF", "#FF1493", "#00CED1", "#228B22", "#20B2AA", "#FF4500"],
   };
 
   const [firstImage, setFirstImage] = useState(listing.img_uri[0]);
   const [secondImages, setSecondImages] = useState(listing.img_uri);
   let result = [...listing.img_uri];
   const handleChangeImages = (img) => {
-    // console.log("imgg...", img);
-    // console.log("second img...", secondImages);
-    // result = result.filter((i) => i !== img);
-    // console.log("second img...", secondImages);
     setSecondImages(result.filter((i) => i !== img));
-    // console.log("second img2222...", secondImages);
     setFirstImage(img);
-    // console.log("firstimages...", firstImage);
-
-    // console.log("result...", result);
   };
 
   useEffect(() => {
-    console.log(
-      "USE EFFECTT FOR DETAIL LISTINGS................................."
-    );
-    console.log("useefect userslistings...", usersListings);
-    // console.log(firstName, lastName, email);
-    // console.log("EMAIL CURENT USER....", auth.currentUser.email);
     handleChangeImages(listing.img_uri[0]);
     retrieveData();
-  }, [isEditing, listing]);
+  }, [listing]);
 
   const __renderImages = () => {
     return (
@@ -264,7 +140,6 @@ function ListingDetailsScreen({ route }) {
           <View style={styles.cardContent}>
             <View style={styles.header}>
               <View style={styles.mainImageContainer}>
-                {/* <Image style={styles.mainImage} source={{ uri: mainImage }} /> */}
                 <Image style={styles.mainImage} source={{ uri: firstImage }} />
               </View>
               {__renderImages()}
@@ -277,7 +152,6 @@ function ListingDetailsScreen({ route }) {
             <Text style={styles.cardTitle}>Price</Text>
             <Text style={styles.price}>${listing.price}</Text>
           </View>
-          {/* <View style={styles.cardContent}>{__renderColors()}</View> */}
         </View>
 
         <View style={styles.card}>
@@ -290,8 +164,6 @@ function ListingDetailsScreen({ route }) {
         </View>
 
         <View style={styles.card}>
-          {/* <View style={styles.cardContent}> */}
-          {/* ---------------------------------- */}
           <View style={styles.box}>
             <Image style={styles.img} source={{ uri: profilePicture }} />
             <View style={styles.boxContent}>
@@ -333,10 +205,8 @@ function ListingDetailsScreen({ route }) {
           <OtherUserListings
             usersListings={usersListings}
             focusedListing={listing}
-            // onPress={() => navigation.navigate("ListingDetails", item)}
           />
         )}
-        {/* </View> */}
       </ScrollView>
     </View>
   );
@@ -344,18 +214,9 @@ function ListingDetailsScreen({ route }) {
 
 const styles = StyleSheet.create({
   box: {
-    // shadowColor: colors.dark,
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 1,
-    // },
-    // shadowOpacity: 0.37,
-    // shadowRadius: 10.49,
-    // elevation: 10,
     padding: 10,
     marginTop: 2,
     marginBottom: 5,
-    // marginRight: 5,
     backgroundColor: colors.white,
     flexDirection: "row",
   },
@@ -491,7 +352,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   cardHeader: {
-    // flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 12.5,
     paddingBottom: 10,

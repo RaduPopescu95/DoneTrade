@@ -2,12 +2,10 @@ import React from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import colors from "../config/colors";
 import Icon from "./Icon";
 
 export default function Category(props) {
@@ -67,7 +65,6 @@ export default function Category(props) {
       value: 9,
     },
   ];
-  let borderShadow = {};
   if (props.keyBorderWidth > 0) {
     console.log("testing 0....");
     borderShadow = {
@@ -82,9 +79,6 @@ export default function Category(props) {
       elevation: 3,
     };
   }
-  const handleChangeCategories = () => {
-    console.log("Asdas");
-  };
   return (
     <View
       style={{
@@ -92,28 +86,19 @@ export default function Category(props) {
         backgroundColor: "#fff",
         paddingVertical: 10,
         paddingLeft: 0,
-        // borderTopWidth: 1,
-        // borderTopColor: colors.secondary,
         alignItems: "center",
       }}
     >
       <View
         style={{
-          // borderTopWidth: 1,
-          // borderTopColor: colors.secondary,
           marginTop: 2,
           width: "90%",
-          // height: 20,
           alignItems: "center",
         }}
       >
         <View
           style={{
-            // borderTopWidth: 1,
-            // borderTopColor: colors.secondary,
-            // marginTop: 20,
             width: "100%",
-            // height: 20,
             justifyContent: "space-between",
             flexDirection: "row",
           }}
@@ -150,28 +135,16 @@ export default function Category(props) {
             <View
               key={index}
               style={{
-                // borderTopWidth: 1,
-                // borderTopColor: colors.medium,
                 marginRight: 10,
                 marginLeft: 10,
               }}
             >
-              {/* // <View key={index}> */}
-              {/* <Image
-              source={item.image}
-              style={{
-                width: 50,
-                height: 40,
-                resizeMode: "contain",
-              }}
-            /> */}
               <TouchableOpacity
                 onPress={() => {
                   props.handleCategorySelection(item);
                 }}
                 style={{
                   alignItems: "center",
-                  // marginRight: 20,
                   marginTop: 2,
                   marginBottom: 5,
                 }}
@@ -191,30 +164,6 @@ export default function Category(props) {
         ))}
       </ScrollView>
     </View>
-    // <TouchableWithoutFeedback onPress={props.onPress}>
-    //   <View
-    //     style={[
-    //       {
-    //         height: 130,
-    //         width: 130,
-    //         marginLeft: 20,
-    //         borderWidth: props.keyBorderWidth > 0 ? props.keyBorderWidth : 0.5,
-    //         borderColor:
-    //           props.keyBorderWidth > 0 ? props.keyStyle : colors.medium,
-    //       },
-    //     ]}
-    //   >
-    //     <View style={{ flex: 2 }}>
-    //       <Image
-    //         source={props.imageUri}
-    //         style={{ flex: 1, width: null, height: null, resizeMode: "cover" }}
-    //       />
-    //     </View>
-    //     <View style={{ flex: 1, paddingLeft: 10, paddingTop: 10 }}>
-    //       <Text>{props.name}</Text>
-    //     </View>
-    //   </View>
-    // </TouchableWithoutFeedback>
   );
 }
 

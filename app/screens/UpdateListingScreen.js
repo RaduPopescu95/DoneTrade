@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Alert } from "react-native";
 import * as Yup from "yup";
-import useLocation from "../hooks/useLocation";
-import {
-  ref,
-  uploadBytes,
-  uploadBytesResumable,
-  deleteObject,
-} from "firebase/storage";
-import LottieView from "lottie-react-native";
-
+import { ref, uploadBytes, deleteObject } from "firebase/storage";
 import {
   Form,
   FormField,
@@ -21,16 +13,11 @@ import Screen from "../components/Screen";
 import FormImagePicker from "../components/forms/FormImagePicker";
 import colors from "../config/colors";
 import { authentication, db, storage } from "../../firebase";
-// import { db } from "../firebase";
 import {
-  addDoc,
   collection,
   doc,
-  query,
   serverTimestamp,
-  setDoc,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import Loader from "../components/Loader";
@@ -104,67 +91,36 @@ const categories = [
 ];
 
 function UpdateListingScreen({ route }) {
-  const [signedIn, setSignedIn] = useState(false);
-  const [userId, setUserId] = useState("");
   const [currentUserOnline, setCurrentUserOnline] = useState("");
-  const [imageUrl, setImageUrl] = useState([]);
-  const [imageAsFile, setImageAsFile] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [fileNames, setFileNames] = useState([]);
-  const location = useLocation();
   const navigation = useNavigation();
   const auth = authentication;
-  const allInputs = { imgUrl: "" };
   let fileNamesArray = [];
   const listing = route.params;
-  // const db = firebase.firestore
 
   useEffect(() => {
-    console.log("useEffect for edit started");
-    // console.log("Listings...to edit", listing);
-
     setCurrentUserOnline(auth.currentUser);
-
-    const collectionIds = currentUserOnline;
     setUploadVisible(false);
-    // console.log(collectionIds.email);
-    // setLoading(false);
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // console.log(user.uid);
-        setSignedIn(true);
-        setUserId(user.uid);
-      } else setSignedIn(false);
-    });
   }, []);
 
   const uploadImage = async (images) => {
-    console.log("new images...", images);
-    console.log("old images...", listing.img_names);
-
     setLoading(true);
     for (let i = 0; i < images.length; i++) {
-      console.log("values images2...", images[i]);
       const fileName = images[i].split("/").pop();
-      const fileType = fileName.split(".").pop();
+      // const fileType = fileName.split(".").pop();
       const storageRef = ref(
         storage,
         `images/posts/${currentUserOnline.uid}&&${fileName}`
       );
-      console.log("img...No");
       const img = await fetch(images[i]);
-      console.log("img...Yes");
       const bytes = await img.blob();
-      // console.log("bytes...", JSON.stringify(bytes));
       await uploadBytes(storageRef, bytes);
     }
 
     // Delete old photos from storage
     for (let i = 0; i < listing.img_names.length; i++) {
       // Create a reference to the file to delete
-      console.log(`${i} img...`, listing.img_names[i]);
       const desertRef = ref(
         storage,
         `images/posts/${currentUserOnline.uid}&&${listing.img_names[i]}`
@@ -192,26 +148,7 @@ function UpdateListingScreen({ route }) {
   };
 
   const handleAddItem = async (values, { resetForm }, file) => {
-    console.log("ADD ITEM..", values);
-    console.log("start 1");
-    const unsub = query(
-      collection(db, "Users"),
-      where("owner_uid", "==", userId)
-    );
-
-    const Titlu = values.title;
-
-    console.log("start 2");
-    // if (values.images) {
-    //   console.log("values images....3", values.images);
-    //   setImageUrl(values.images);
-    // }
-    // console.log("imageUrl...", imageUrl);
-    // Add POSTS TO USER
-    // try {
-    // console.log("key of listing...", listing.key);
     try {
-      console.log("start 3");
       const docUpdated = doc(
         db,
         "Users",
@@ -221,7 +158,6 @@ function UpdateListingScreen({ route }) {
       );
       console.log("start 4");
       const colRef = collection(docUpdated, "Posts");
-      // console.log("document s...", docUpdated);
       for (let i = 0; i < values.images.length; i++) {
         console.log("values images3...", values.images[i]);
         const fileName = values.images[i].split("/").pop();
@@ -244,39 +180,14 @@ function UpdateListingScreen({ route }) {
       console.log("returned?...");
       // UPDATE FIELDS IN DOCUMENT
       await updateDoc(docUpdated, {
-        // user: currentUserOnline.email,
-        // owner_uid: currentUserOnline.uid,
         title: values.title,
         price: values.price,
         category: values.category,
         description: values.description,
         updatedAt: serverTimestamp(),
-        // likes: 0,
-        // comments: [],
-        // likes_by_users: [],
         img_names: fileNamesArray,
       });
       uploadImage(values.images);
-
-      //   console.log("fileNamesArrayNew...", fileNamesArray);
-
-      //   addDoc(colRef, {
-      //     // image: values.images,
-      //     user: currentUserOnline.email,
-      //     owner_uid: currentUserOnline.uid,
-      //     title: values.title,
-      //     price: values.price,
-      //     category: values.category,
-      //     description: values.description,
-      //     createdAt: serverTimestamp(),
-      //     likes: 0,
-      //     comments: [],
-      //     likes_by_users: [],
-      //     img_names: fileNamesArray,
-      //   });
-
-      //   //   // alert("Success");
-      //   //   resetForm();
     } catch (err) {
       console.log("Could not save the listing", err);
     }
@@ -294,7 +205,6 @@ function UpdateListingScreen({ route }) {
           category: listing.category.label,
           images: listing.img_uri,
         }}
-        // onSubmit={(values) => console.log(location)}
         onSubmit={handleAddItem}
         validationSchema={validationSchema}
       >
@@ -315,6 +225,7 @@ function UpdateListingScreen({ route }) {
           PickerItemComponent={CategoryPickerItem}
           placeholder="Category"
           width="50%"
+          categoryValue={listing.category}
         />
         <FormField
           maxLength={255}

@@ -8,7 +8,6 @@ import {
   Text,
   TouchableHighlight,
   TouchableOpacity,
-  Modal,
 } from "react-native";
 import * as Yup from "yup";
 import { authentication, db, storage } from "../../firebase";
@@ -30,12 +29,10 @@ import {
 import { ListItemSeparator } from "../components/lists";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Screen from "../components/Screen";
 import { Form } from "../components/forms";
 import colors from "../config/colors";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
-import ProfilePictPicker from "../components/forms/ProfilePictPicker";
 import ProfilePictEdit from "../components/forms/ProfilePictEdit";
 import UploadScreen from "./UploadScreen";
 
@@ -130,19 +127,7 @@ function EditProfileScreen({ route }) {
       });
   };
 
-  const uploadProfilePicture = async (image, values) => {
-    const fileName = image.split("/").pop();
-    const storageRef = ref(
-      storage,
-      `images/${values.email}/profilePict/${fileName}`
-    );
-    const img = await fetch(image);
-    const bytes = await img.blob();
-    await uploadBytes(storageRef, bytes);
-  };
-
   const handleFinalDelete = async () => {
-    console.log("...curentuser", auth.currentUser.uid);
     // // Delete the file (REMEMBER TO ADD DELETE ALL IMG POSTS WHEN DELETTING USER)
     const desertRef = ref(
       storage,
@@ -178,6 +163,8 @@ function EditProfileScreen({ route }) {
       .delete()
       .then(() => console.log("User deleted"))
       .catch((error) => console.log(error));
+
+    navigation.navigate("Feed");
   };
 
   const handleDeleteAccount = () => {

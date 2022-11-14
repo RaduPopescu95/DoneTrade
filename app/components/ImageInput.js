@@ -24,7 +24,6 @@ export default function ImageInput({ imgUri, onChangeImage }) {
           text: "No",
         },
       ]);
-    // selectImage();
   };
 
   const requestPermision = async () => {

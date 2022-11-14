@@ -5,34 +5,20 @@ import {
   Text,
   View,
   TextInput,
-  Button,
-  TouchableHighlight,
-  Image,
   Alert,
   TouchableOpacity,
 } from "react-native";
 import * as Yup from "yup";
 import {
-  addDoc,
-  collection,
   doc,
   query,
-  serverTimestamp,
-  setDoc,
   updateDoc,
-  where,
   collectionGroup,
   getDocs,
 } from "firebase/firestore";
-import { getAuth, updatePassword, signOut, updateEmail } from "firebase/auth";
-import { Formik, useFormikContext } from "formik";
-import { authentication, db, storage } from "../../../firebase";
-import {
-  Form,
-  FormField,
-  FormPicker as Picker,
-  SubmitButton,
-} from "../forms/Form";
+import { updatePassword, signOut, updateEmail } from "firebase/auth";
+import { Formik } from "formik";
+import { authentication, db } from "../../../firebase";
 import colors from "../../config/colors";
 import ErrorMessage from "./ErrorMessage";
 
@@ -46,7 +32,6 @@ const validationSchemaLastName = Yup.object().shape({
   lastName: Yup.string()
     .required("Last name is a required field")
     .label("LastName"),
-  // email: Yup.string().required().email().label("Email"),
 });
 
 const validationSchemaPhoneNumber = Yup.object().shape({
@@ -67,15 +52,7 @@ const validationSchemaPassword = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], "Passwords must match"),
 });
 
-function ProfileEditor({
-  // name,
-  // width,
-  // bgColorContactSeller,
-  // defaultValue,
-  // ...otherProps
-  route,
-  navigation,
-}) {
+function ProfileEditor({ route, navigation }) {
   const option = route.params;
   const [focus, setFocus] = useState(false);
   const [focusConfirm, setFocusConfirm] = useState(false);
@@ -86,9 +63,6 @@ function ProfileEditor({
   const auth = authentication;
   let confirmPassword = "confirmPassword";
   let usersPosts = [];
-  // const { handleSubmit } = useFormikContext();
-  // const { setFieldTouched, handleChange, errors, touched } = useFormikContext();
-
   let validationSchema = "";
 
   switch (initialValue) {
@@ -144,7 +118,6 @@ function ProfileEditor({
                     error.message
                   );
                 });
-              // navigation.navigate("LoginScreen")
             },
             style: "cancel",
           },
@@ -162,13 +135,9 @@ function ProfileEditor({
       const posts = query(collectionGroup(db, "Posts"));
       const querySnapshot = await getDocs(posts);
       querySnapshot.forEach((doc) => {
-        // console.log(usersPosts.length);
         if (doc.data().user === auth.currentUser.email) {
-          // console.log("yes");
-          // console.log("curent user...", auth.currentUser.email);
           usersPosts.push({ ...doc.data(), key: doc.id });
         }
-        // console.log(usersPosts.length);
       });
       for (let i = 0; i < usersPosts.length; i++) {
         console.log("usersposts...", usersPosts[i].key);
@@ -206,8 +175,6 @@ function ProfileEditor({
         onPress: () => {
           signOut(auth)
             .then((re) => {
-              setIsSignedIn(false);
-              console.log("signedOut");
               navigation.replace("LoginScreen");
             })
             .catch((error) => {
@@ -216,7 +183,6 @@ function ProfileEditor({
                 error.message
               );
             });
-          // navigation.navigate("LoginScreen")
         },
         style: "cancel",
       },
@@ -225,12 +191,10 @@ function ProfileEditor({
 
   const handleAddItem = async (values, { resetForm }, file) => {
     if (option.title === "Change password") {
-      console.log("passs....", values.password);
       handleChangePassword(values.password);
       return;
     }
     if (option.title === "Email") {
-      console.log("EMAIL....", values.email);
       const docUpdated = doc(db, "Users", currentUserOnline.uid);
       await updateDoc(docUpdated, {
         [firebaseParam]: values[initialValue],
@@ -238,11 +202,6 @@ function ProfileEditor({
       handleChangeEmail(values.email);
       return;
     }
-    console.log("EDIT ITEM..", values);
-    // const unsub = query(
-    //   collection(db, "Users"),
-    //   where("owner_uid", "==", userId)
-    // );
     const docUpdated = doc(db, "Users", currentUserOnline.uid);
     await updateDoc(docUpdated, {
       [firebaseParam]: values[initialValue],
@@ -261,83 +220,18 @@ function ProfileEditor({
         },
       ]
     );
-    // const Titlu = values.title;
-    // if (values.images) {
-    //   console.log("values images....3", values.images);
-    //   setImageUrl(values.images);
-    // }
-    // console.log("imageUrl...", imageUrl);
-    // Add POSTS TO USER
-    // try {
-    //   const docRef = doc(db, "Users", currentUserOnline.email);
-    //   const colRef = collection(docRef, "Posts");
-    //   for (let i = 0; i < values.images.length; i++) {
-    //     console.log("values images2...", values.images[i]);
-    //     const fileName = values.images[i].split("/").pop();
-    //     fileNamesArray.push(fileName);
-    //   }
-    //   console.log("fileNamesArrayNew...", fileNamesArray);
-    //   if (fileNamesArray.length > 4) {
-    //     Alert.alert(
-    //       "Maximum 4 photos allowed for upload!",
-    //       `Please delete ${fileNamesArray.length - 4} photos and continue`,
-    //       [
-    //         {
-    //           text: "Ok",
-    //           onPress: () => console.log("Ok Pressed"),
-    //           style: "cancel",
-    //         },
-    //       ]
-    //     );
-    //     return;
-    //   }
-    //   console.log("returned?...");
-    //   addDoc(colRef, {
-    //     // image: values.images,
-    //     user: currentUserOnline.email,
-    //     owner_uid: currentUserOnline.uid,
-    //     title: values.title,
-    //     price: values.price,
-    //     category: values.category,
-    //     description: values.description,
-    //     createdAt: serverTimestamp(),
-    //     likes: 0,
-    //     comments: [],
-    //     likes_by_users: [],
-    //     img_names: fileNamesArray,
-    //   });
-    //   uploadImage(values.images);
-    //   // alert("Success");
-    //   resetForm();
-    // } catch (err) {
-    //   console.log("Could not save the listing", err);
-    // }
   };
 
   useEffect(() => {
     navigation.setOptions({ headerTitle: option.title });
     setCurrentUserOnline(auth.currentUser);
-    console.log("options...", option.title);
   }, []);
   return (
     <>
-      {/* <Form
-        initialValues={{
-          title: "",
-          price: "",
-          description: "",
-          category: null,
-          images: [],
-        }}
-        // onSubmit={(values) => console.log(location)}
-        onSubmit={handleAddItem}
-        // validationSchema={validationSchema}
-      > */}
       <Formik
         initialValues={{
           [initialValue]: opt,
         }}
-        // onSubmit={(values) => console.log(location)}
         onSubmit={handleAddItem}
         validationSchema={validationSchema}
       >
@@ -364,7 +258,6 @@ function ProfileEditor({
                   {
                     height: 45,
                     marginLeft: 16,
-                    // borderBottomColor: colors.secondary,
                     flex: 1,
                     borderBottomWidth: 1,
                     width: "100%",
@@ -384,11 +277,8 @@ function ProfileEditor({
                     ? "password"
                     : option.firebaseParam
                 }
-                // name="password"
                 value={values[initialValue]}
-                // value={opt}
                 underlineColorAndroid="transparent"
-                // onChangeText={(newText) => setOpt(newText)}
                 onChangeText={handleChange(initialValue)}
                 keyboardType={option.title === "Phone number" ? "number" : ""}
               />
@@ -416,7 +306,6 @@ function ProfileEditor({
                       {
                         height: 45,
                         marginLeft: 16,
-                        // borderBottomColor: colors.secondary,
                         flex: 1,
                         borderBottomWidth: 1,
                         width: "100%",
@@ -441,22 +330,12 @@ function ProfileEditor({
                 />
               </>
             )}
-            {/* <View style={styles.buttonContainer}> */}
-            <TouchableOpacity
-              // style={[styles.button, { backgroundColor: colors[color] }]}
-              style={styles.button}
-              onPress={handleSubmit}
-              // title="Submit"
-            >
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.text}>Save</Text>
             </TouchableOpacity>
-            {/* </View> */}
           </View>
         )}
-        {/* </Form> */}
       </Formik>
-      {/* <View style={styles.containerButton}>
-      </View> */}
     </>
   );
 }
@@ -467,7 +346,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-    // alignContent: "flex-end",
     padding: 15,
     width: "80%",
     marginVertical: 20,
@@ -483,7 +361,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     backgroundColor: colors.light,
-    // flexWrap: "wrap",
   },
   containerButton: {
     padding: 10,
@@ -496,13 +373,8 @@ const styles = StyleSheet.create({
   },
   textPlaceHolder: {
     width: "100%",
-
     fontSize: 20,
-    // borderColor: colors.dark,
     backgroundColor: colors.light,
-    // borderRadius: 30,
-    // borderBottomWidth: 1,
-
     height: 17,
     marginTop: 20,
     paddingLeft: 30,
@@ -514,21 +386,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   inputContainer: {
-    // borderColor: colors.dark,
     backgroundColor: colors.light,
-    // borderRadius: 30,
-    // borderBottomWidth: 1,
     width: 300,
     height: 45,
     marginTop: 0,
     flexDirection: "column",
-    // flex: 1
     alignItems: "center",
   },
   inputs: {
     height: 45,
     marginLeft: 16,
-    // borderBottomColor: colors.secondary,
     flex: 1,
     borderBottomWidth: 1,
   },
@@ -536,7 +403,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     height: 45,
     marginLeft: 16,
-    // borderBottomColor: "#FFFFFF",
     flex: 1,
   },
   inputIcon: {
@@ -546,20 +412,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonContainer: {
-    // height: 45,
-    // flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 20,
-    // width: "80%",
-    // borderRadius: 30,
     backgroundColor: colors.light,
   },
   sendButton: {
     marginTop: 30,
     backgroundColor: colors.primary,
     alignContent: "stretch",
-    // alignSelf: "flex-end",
   },
   buttonText: {
     color: "white",

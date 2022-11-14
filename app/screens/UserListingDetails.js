@@ -1,91 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  ScrollView,
-  View,
-  Image,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Button,
-  TouchableOpacity,
-  Text,
-  Animated,
-  Easing,
-  Platform,
-  TextInput,
-  TouchableHighlight,
-  Alert,
-  FlatList,
-  Linking,
-} from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { sendSignInLinkToEmail, signOut } from "firebase/auth";
-import { authentication, db, storage } from "../../firebase";
-import { ref, getDownloadURL, list } from "firebase/storage";
-import {
-  doc,
-  getDoc,
-  getDocs,
-  collection,
-  query,
-  where,
-  collectionGroup,
-} from "firebase/firestore";
 
 import colors from "../config/colors";
-import ListItem from "../components/lists/ListItem";
-// import Text from "../components/Text";
-import ContactSellerForm from "../components/ContactSellerForm";
-import ImageInput from "../components/ImageInput";
-import OtherUserListings from "../components/OtherUserListings";
 
 export default function UserListingDetails({ route, navigation }) {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [userSelected, setUserSelected] = useState([]);
-  const [selectedImage, setSelectedImage] = useState({});
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [profilePicture, setProfilePicture] = useState("");
-  const [firstName, setFirstName] = useState("firstName");
-  const [lastName, setLastName] = useState("SecondName");
-  const [email, setEmail] = useState("email");
-  const [contact, setContacted] = useState(false);
-  const [isPresentUser, setIsPresentUser] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [usersListings, setUserListings] = useState([]);
-  // const [value] = useState(new Animated.Value(0));
-  const auth = authentication;
-  const userNow = {};
   const listing = route.params;
-  const product = {
-    name: "Lorem ipsum dolor sit amet",
-    description:
-      "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
-    created: "",
-    images: [
-      "https://bootdey.com/img/Content/avatar/avatar6.png",
-      "https://bootdey.com/img/Content/avatar/avatar2.png",
-      "https://bootdey.com/img/Content/avatar/avatar3.png",
-    ],
-    colors: ["#00BFFF", "#FF1493", "#00CED1", "#228B22", "#20B2AA", "#FF4500"],
-  };
-
-  const __setImageSelected = (image) => {
-    setSelectedImage({ selectedImage: image });
-  };
-
   const [firstImage, setFirstImage] = useState(listing.img_uri[0]);
   const [secondImages, setSecondImages] = useState(listing.img_uri);
   let result = [...listing.img_uri];
-  const handleChangeImages = (img) => {
-    // console.log("imgg...", img);
-    // console.log("second img...", secondImages);
-    // result = result.filter((i) => i !== img);
-    // console.log("second img...", secondImages);
-    setSecondImages(result.filter((i) => i !== img));
-    // console.log("second img2222...", secondImages);
-    setFirstImage(img);
-    // console.log("firstimages...", firstImage);
 
-    // console.log("result...", result);
+  const handleChangeImages = (img) => {
+    setSecondImages(result.filter((i) => i !== img));
+    setFirstImage(img);
   };
 
   const __renderImages = () => {
@@ -116,17 +43,11 @@ export default function UserListingDetails({ route, navigation }) {
     );
   };
 
-  useEffect(() => {
-    console.log(
-      "USE EFFECTT FOR DETAIL LISTINGS................................."
-    );
-
-    console.log("listing....here", listing);
-  }, [isEditing]);
+  useEffect(() => {}, []);
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.content}>
+      <View style={styles.content}>
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.name}>{listing.title}</Text>
@@ -146,7 +67,6 @@ export default function UserListingDetails({ route, navigation }) {
             <Text style={styles.cardTitle}>Price</Text>
             <Text style={styles.price}>${listing.price}</Text>
           </View>
-          {/* <View style={styles.cardContent}>{__renderColors()}</View> */}
         </View>
 
         <View style={styles.card}>
@@ -157,20 +77,16 @@ export default function UserListingDetails({ route, navigation }) {
             <Text style={styles.description}>{listing.description}</Text>
           </View>
         </View>
-
-        <View style={styles.card}>
-          <View style={styles.cardContent}>
-            <TouchableOpacity
-              style={styles.shareButton}
-              onPress={() =>
-                navigation.navigate("UpdateListingScreen", listing)
-              }
-            >
-              <Text style={styles.shareButtonText}>Edit Listing</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.shareButton}
+            onPress={() => navigation.navigate("UpdateListingScreen", listing)}
+          >
+            <MaterialCommunityIcons name="pencil" color={"white"} size={20} />
+            <Text style={styles.shareButtonText}>Edit</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -185,6 +101,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginTop: 20,
+    height: "100%",
   },
   header: {
     flexDirection: "row",
@@ -229,17 +146,32 @@ const styles = StyleSheet.create({
     color: "#696969",
   },
   shareButton: {
-    marginTop: 10,
     height: 45,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 30,
-    backgroundColor: colors.primary,
+    marginTop: 4,
+    backgroundColor: colors.medium,
+    width: "90%",
+    borderRightColor: colors.primary,
+    borderTopColor: colors.primary,
+    borderRightWidth: 2,
+    borderTopWidth: 2,
+    borderBottomStartRadius: 30,
+  },
+  buttonContainer: {
+    position: "absolute",
+    right: 0,
+    top: 1,
+    height: 90,
+    width: 90,
+    flexDirection: "column",
+    alignItems: "center",
   },
   shareButtonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 20,
+    marginLeft: 5,
   },
 
   /******** card **************/
@@ -262,7 +194,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   cardHeader: {
-    // flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 6.5,
     paddingBottom: 15,

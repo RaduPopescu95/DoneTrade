@@ -1,13 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TextInput,
-} from "react-native";
+import { FlatList, StyleSheet, View, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import Constants from "expo-constants";
 import { authentication, db, storage } from "../../firebase";
@@ -25,15 +17,11 @@ import {
 import Card from "../components/Card";
 import colors from "../config/colors";
 import Screen from "../components/Screen";
-import routes from "../navigation/routes";
 import { useState } from "react/cjs/react.development";
 import LinkList from "react-native/Libraries/NewAppScreen/components/LearnMoreLinks";
 import Loader from "../components/Loader";
 import { ref, getDownloadURL, listAll, child } from "firebase/storage";
-import SearchBox from "../components/SearchBox";
-import OtherUserListings from "../components/OtherUserListings";
 import Category from "../components/Category";
-// import { onSnapshot } from "firebase/firestore";
 
 const listingss = [
   {

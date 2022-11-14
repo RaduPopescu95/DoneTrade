@@ -10,7 +10,6 @@ const screenOption = {
 
 const FeedNavigator = () => (
   <Stack.Navigator screenOptions={screenOption}>
-    {/* <Stack.Screen name="Feed" component={FeedNavigator} /> */}
     <Stack.Screen
       name="Listings"
       component={ListingsScreen}

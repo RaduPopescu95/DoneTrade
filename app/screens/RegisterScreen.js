@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
-  Button,
   Alert,
-  TextInput,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -13,9 +11,7 @@ import * as Yup from "yup";
 import { authentication, db, storage } from "../../firebase";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
 import { setDoc, doc } from "firebase/firestore";
-// import * as auth from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import Screen from "../components/Screen";
 import { Form, FormField, SubmitButton } from "../components/forms";
 import colors from "../config/colors";
 import { useNavigation } from "@react-navigation/native";
@@ -46,39 +42,22 @@ const validationSchema = Yup.object().shape({
 });
 
 function RegisterScreen() {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [profileImg, setProfileImg] = useState([]);
-  const [currentUserOnline, setCurrentUserOnline] = useState("");
   const [uploadVisible, setUploadVisible] = useState(false);
   const navigation = useNavigation();
   const auth = authentication;
 
   const handleSignUp = async (values) => {
-    console.log("START PROFILE PICTURE UPLOAD");
-    console.log(values.email);
-    setCurrentUserOnline(values.email);
-    console.log("START 1");
-    console.log(values.profilePict);
     const fileName = values.profilePict.split("/").pop();
-    console.log("START 2");
-    console.log(fileName);
-    const fileType = fileName.split(".").pop();
-    console.log("START 3");
-
+    // const fileType = fileName.split(".").pop();
     setUploadVisible(true);
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredentials) => {
         setTimeout(async () => {
           const user = userCredentials.user;
           const storageRef = ref(storage, `images/profilePict/${user.uid}`);
-
           const img = await fetch(values.profilePict);
-
           const bytes = await img.blob();
-
           await uploadBytes(storageRef, bytes);
-          console.log("Starting PASS");
-          setIsSignedIn(true);
           const collectionId = "Users";
           const documentId = user.uid;
           const value = {
@@ -87,13 +66,10 @@ function RegisterScreen() {
             lastName: values.lastName,
             phoneNumber: values.phoneNumber,
             email: user.email,
-            // profilePicture: getRandomProfilePicture(),
           };
           setDoc(doc(db, collectionId, documentId), value);
           console.log("success PASS");
         }, 1500);
-
-        // navigation.replace("AppNavigator");
       })
 
       .catch((error) => {
@@ -113,33 +89,8 @@ function RegisterScreen() {
       });
   };
 
-  const uploadProfilePicture = async (image, values) => {
-    // setLoading(true);
-    console.log(image);
-    console.log("START 1");
-    const fileName = image.split("/").pop();
-    console.log("START 2");
-    const fileType = fileName.split(".").pop();
-    console.log("START 3");
-    const storageRef = ref(
-      storage,
-      `images/${values.email}/profilePict/${user.uid}`
-    );
-    console.log("START 4");
-    const img = await fetch(image);
-    console.log("START 5");
-    console.log("START 6");
-    const bytes = await img.blob();
-    console.log("START 7");
-    await uploadBytes(storageRef, bytes);
-    console.log("START 8");
-    // setLoading(false);
-    //  navigation.goBack();
-  };
+  useEffect(() => {}, []);
 
-  useEffect(() => {
-    console.log("registerUseEffect.....");
-  }, []);
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -229,10 +180,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: colors.light,
-    // flex: 1,
-
     paddingTop: Constants.statusBarHeight,
-    // paddingBottom: 30,
     height: "100%",
   },
   button: {
@@ -241,9 +189,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 5,
-    // padding: 5,
-    // width: "100%",
-    // marginVertical: 0,
   },
   text: {
     color: colors.dark,

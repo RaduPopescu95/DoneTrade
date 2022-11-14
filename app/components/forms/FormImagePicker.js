@@ -21,17 +21,7 @@ export default function FormImagePicker({ name, images }) {
     );
   };
 
-  useEffect(() => {
-    // if (images) {
-    //   for (let i = 0; i < images.length; i++) {
-    //     // console.log(`img...${i}...`, images[i]);
-    //     handleAdd(images[i]);
-    //   }
-    // }
-    console.log(`imguriss..${imgUris.length}`, imgUris);
-    console.log(`name...`, name);
-    console.log(`images...`, images);
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <>

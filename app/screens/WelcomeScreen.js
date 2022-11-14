@@ -5,11 +5,9 @@ import {
   View,
   Image,
   Text,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
-
+import { useIsFocused } from "@react-navigation/native";
 import { authentication } from "../../firebase";
 
 import Button from "../components/Button";
@@ -32,7 +30,6 @@ function WelcomeScreen({ navigation }) {
   return (
     <ImageBackground
       blurRadius={10}
-      // style={styles.background}
       style={[
         styles.background,
         { justifyContent: isLoading ? "center" : "flex-end" },
@@ -44,7 +41,6 @@ function WelcomeScreen({ navigation }) {
         <Text style={styles.tagline}>Sell What You Don't Need</Text>
       </View>
       {isLoading ? (
-        // <ActivityIndicator animating={isLoading} size="large" />
         <Loader visible={isLoading} />
       ) : (
         <View style={styles.buttonsContainer}>

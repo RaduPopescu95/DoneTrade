@@ -20,8 +20,8 @@ function AppPicker({
   numberOfColumns = 1,
   onSelectItem,
   PickerItemComponent = PickerItem,
-  placeholder,
   selectedItem,
+  categoryValue,
   width = "100%",
 }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,20 +30,13 @@ function AppPicker({
     <>
       <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
         <View style={[styles.container, { width }]}>
-          {icon && (
-            <MaterialCommunityIcons
-              name={icon}
-              size={20}
-              color={defaultStyles.colors.medium}
-              style={styles.icon}
-            />
-          )}
-          {/* {selectedItem ? (
+          {!selectedItem ? (
+            <Text style={styles.placeholder}>
+              {!categoryValue ? "Category" : categoryValue}
+            </Text>
+          ) : (
             <Text style={styles.text}>{selectedItem}</Text>
-            ) : (
-              <Text style={styles.placeholder}>{placeholder}</Text>
-              )} */}
-          <Text style={styles.text}>{selectedItem}</Text>
+          )}
 
           <MaterialCommunityIcons
             name="chevron-down"
@@ -66,7 +59,6 @@ function AppPicker({
                 onPress={() => {
                   setModalVisible(false);
                   onSelectItem(item);
-                  // console.log("items...", item);
                 }}
               />
             )}

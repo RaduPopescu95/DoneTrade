@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Image,
   View,
-  Platform,
   TouchableOpacity,
   Text,
   StyleSheet,
@@ -11,15 +10,8 @@ import {
 import { useFormikContext } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
-import colors from "../../config/colors";
-import { TouchableHighlight } from "react-native-gesture-handler";
 
-export default function ProfilePictPicker({
-  onSelectProfileUri,
-  name,
-  img,
-  profileImage,
-}) {
+export default function ProfilePictPicker({ name, img }) {
   const [image, setImage] = useState(null);
   const { errors, setFieldValue, touched, values } = useFormikContext();
 
@@ -40,8 +32,6 @@ export default function ProfilePictPicker({
       setImage(_image.uri);
     }
 
-    console.log("IMAGE......", _image.uri);
-
     setFieldValue(name, _image.uri);
   };
 
@@ -61,7 +51,6 @@ export default function ProfilePictPicker({
 
   useEffect(() => {
     requestPermision();
-    // console.log(imgUri);
   }, []);
 
   return (
@@ -83,9 +72,6 @@ export default function ProfilePictPicker({
             <AntDesign name="camera" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        {/* <View style={imageUploaderStyles.uploadBtnContainer}> */}
-
-        {/* </View> */}
       </View>
     </>
   );
@@ -103,15 +89,9 @@ const imageUploaderStyles = StyleSheet.create({
     overflow: "hidden",
   },
   confirmUpload: {
-    // borderRadius: 999,
-
     position: "absolute",
-
     right: 20,
     bottom: 10,
-    // backgroundColor: colors.white,
-    // width: 70,
-    // height: "30%",
   },
   uploadBtnContainer: {
     opacity: 0.7,

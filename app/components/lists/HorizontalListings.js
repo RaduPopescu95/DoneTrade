@@ -3,12 +3,10 @@ import {
   View,
   Text,
   Image,
-  ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
 } from "react-native";
 import colors from "../../config/colors";
-import Icon from "../Icon";
 
 export default function HorizontalListings(props) {
   let borderShadow = {};

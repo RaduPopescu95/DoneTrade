@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Image,
   View,
-  Platform,
   TouchableOpacity,
   Text,
   StyleSheet,
@@ -11,24 +10,11 @@ import {
 import { useFormikContext } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
-import colors from "../../config/colors";
 import { authentication, db, storage } from "../../../firebase";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
+import { ref, uploadBytes, deleteObject } from "firebase/storage";
 
-export default function ProfilePictEdit({
-  onSelectProfileUri,
-  name,
-  img,
-  profileImage,
-  newImg,
-}) {
+export default function ProfilePictEdit({ img, newImg }) {
   const [image, setImage] = useState(null);
-  const { errors, setFieldValue, touched, values } = useFormikContext();
   const auth = authentication;
 
   const requestPermision = async () => {
@@ -48,10 +34,6 @@ export default function ProfilePictEdit({
       "Profile image change",
       "Are you sure you want to change your profile picture?",
       [
-        // {
-        //   text: "Choose another image",
-        //   onPress: () => addImage(),
-        // },
         {
           text: "Keep profile picture",
           onPress: () => console.log("Cancel Pressed"),
@@ -69,11 +51,6 @@ export default function ProfilePictEdit({
     if (!img.cancelled) {
       setImage(img.uri);
     }
-
-    console.log("IMAGE......", img.uri);
-
-    // setFieldValue(name, img.uri);
-
     const desertRef = ref(
       storage,
       `images/profilePict/${auth.currentUser.uid}`
@@ -87,24 +64,18 @@ export default function ProfilePictEdit({
         console.log("error deleting file...", error);
         // Uh-oh, an error occurred!
       });
-
-    console.log("...curentuser", auth.currentUser.uid);
     const storageRef = ref(
       storage,
       `images/profilePict/${auth.currentUser.uid}`
     );
-
     const image = await fetch(img.uri);
-
     const bytes = await image.blob();
-
     await uploadBytes(storageRef, bytes);
     newImg(img.uri);
   };
 
   useEffect(() => {
     requestPermision();
-    // console.log(imgUri);
   }, []);
 
   return (
@@ -126,9 +97,6 @@ export default function ProfilePictEdit({
             <AntDesign name="camera" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        {/* <View style={imageUploaderStyles.uploadBtnContainer}> */}
-
-        {/* </View> */}
       </View>
     </>
   );
@@ -146,15 +114,9 @@ const imageUploaderStyles = StyleSheet.create({
     overflow: "hidden",
   },
   confirmUpload: {
-    // borderRadius: 999,
-
     position: "absolute",
-
     right: 20,
     bottom: 10,
-    // backgroundColor: colors.white,
-    // width: 70,
-    // height: "30%",
   },
   uploadBtnContainer: {
     opacity: 0.7,

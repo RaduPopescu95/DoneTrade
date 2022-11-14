@@ -24,7 +24,6 @@ function AccountScreen({ navigation }) {
   const handleSignOut = () => {
     signOut(auth)
       .then((re) => {
-        // setIsSignedIn(false);
         console.log("signedOut");
         navigation.replace("WelcomeScreen");
       })
@@ -42,10 +41,8 @@ function AccountScreen({ navigation }) {
       setFirstName(docSnap.data().firstName);
       setLastName(docSnap.data().lastName);
     } else {
-      // doc.data() will be undefined in this case
       console.log("No such document!");
     }
-    console.log("Retreving Profile Pict---------------------------");
     const reference = ref(
       storage,
       `images/profilePict/${auth.currentUser.uid}`
@@ -62,7 +59,6 @@ function AccountScreen({ navigation }) {
       title: "You",
       color: colors.light,
       titleColor: colors.dark,
-      image: "https://img.icons8.com/color/70/000000/name.png",
       icon: {
         name: "account",
         backgroundColor: colors.primary,
@@ -74,7 +70,6 @@ function AccountScreen({ navigation }) {
       title: "Listings",
       color: colors.light,
       titleColor: colors.dark,
-      image: "https://img.icons8.com/office/70/000000/home-page.png",
       icon: {
         name: "format-list-bulleted",
         backgroundColor: colors.primary,
@@ -86,7 +81,6 @@ function AccountScreen({ navigation }) {
       title: "Log In",
       color: colors.light,
       titleColor: colors.dark,
-      image: "https://img.icons8.com/color/70/000000/two-hearts.png",
       icon: {
         name: "login",
         backgroundColor: colors.secondary,
@@ -99,7 +93,6 @@ function AccountScreen({ navigation }) {
       title: "Register",
       color: colors.light,
       titleColor: colors.dark,
-      image: "https://img.icons8.com/color/70/000000/family.png",
       icon: {
         name: "account-box",
         backgroundColor: colors.primary,
@@ -111,7 +104,6 @@ function AccountScreen({ navigation }) {
       title: "Log Out",
       color: colors.light,
       titleColor: colors.dark,
-      image: "https://img.icons8.com/color/70/000000/two-hearts.png",
       icon: {
         name: "logout",
         backgroundColor: colors.secondary,
@@ -269,7 +261,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     marginHorizontal: 40,
     backgroundColor: "#e2e2e2",
-    //flexBasis: '42%',
     width: 90,
     height: 90,
     borderRadius: 60,

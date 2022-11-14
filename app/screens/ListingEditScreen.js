@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Alert } from "react-native";
 import * as Yup from "yup";
-import useLocation from "../hooks/useLocation";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
 import { useIsFocused } from "@react-navigation/native";
-import LottieView from "lottie-react-native";
-
 import {
   Form,
   FormField,
@@ -17,15 +14,12 @@ import Screen from "../components/Screen";
 import FormImagePicker from "../components/forms/FormImagePicker";
 import colors from "../config/colors";
 import { authentication, db, storage } from "../../firebase";
-// import { db } from "../firebase";
 import {
   addDoc,
   collection,
   doc,
   query,
   serverTimestamp,
-  setDoc,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
@@ -100,41 +94,20 @@ const categories = [
 ];
 
 function ListingEditScreen() {
-  const [signedIn, setSignedIn] = useState(false);
   const [userId, setUserId] = useState("");
   const [currentUserOnline, setCurrentUserOnline] = useState("");
   const [imageUrl, setImageUrl] = useState([]);
-  const [imageAsFile, setImageAsFile] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [fileNames, setFileNames] = useState([]);
   const [val, setVal] = useState("ss");
-  const location = useLocation();
   const navigation = useNavigation();
   const auth = authentication;
-  const allInputs = { imgUrl: "" };
   const fileNamesArray = [];
   const isFocused = useIsFocused();
 
-  // const db = firebase.firestore
-
   useEffect(() => {
-    console.log("useEffect for edit started");
-
     setCurrentUserOnline(auth.currentUser);
-
-    const collectionIds = currentUserOnline;
     setUploadVisible(false);
-    // console.log(collectionIds.email);
-    // setLoading(false);
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // console.log(user.uid);
-        setSignedIn(true);
-        setUserId(user.uid);
-      } else setSignedIn(false);
-    });
   }, [isFocused]);
 
   const uploadImage = async (images) => {
@@ -142,7 +115,7 @@ function ListingEditScreen() {
     for (let i = 0; i < images.length; i++) {
       console.log("values images2...", images[i]);
       const fileName = images[i].split("/").pop();
-      const fileType = fileName.split(".").pop();
+      // const fileType = fileName.split(".").pop();
       const storageRef = ref(
         storage,
         `images/posts/${currentUserOnline.uid}&&${fileName}`
@@ -151,7 +124,6 @@ function ListingEditScreen() {
       const img = await fetch(images[i]);
       console.log("img...Yes");
       const bytes = await img.blob();
-      // console.log("bytes...", JSON.stringify(bytes));
       await uploadBytes(storageRef, bytes);
     }
     setLoading(false);
@@ -167,19 +139,9 @@ function ListingEditScreen() {
   };
 
   const handleAddItem = async (values, { resetForm }, file) => {
-    // console.log("ADD ITEM..", values);
-    const unsub = query(
-      collection(db, "Users"),
-      where("owner_uid", "==", userId)
-    );
-    const docUpdated = doc(db, "Users", currentUserOnline.uid);
-    const Titlu = values.title;
-
     if (values.images) {
-      console.log("values images....3", values.images);
       setImageUrl(values.images);
     }
-    console.log("imageUrl...", imageUrl);
     // Add POSTS TO USER
     try {
       const docRef = doc(db, "Users", currentUserOnline.uid);
@@ -205,9 +167,7 @@ function ListingEditScreen() {
         );
         return;
       }
-      console.log("returned?...");
       addDoc(colRef, {
-        // image: values.images,
         user: currentUserOnline.email,
         owner_uid: currentUserOnline.uid,
         title: values.title,
@@ -221,8 +181,6 @@ function ListingEditScreen() {
         img_names: fileNamesArray,
       });
       uploadImage(values.images);
-      //   // alert("Success");
-      //   resetForm();
     } catch (err) {
       console.log("Could not save the listing", err);
     }
@@ -233,7 +191,6 @@ function ListingEditScreen() {
     <Screen style={styles.container}>
       <Loader visible={loading} />
       <UploadScreen visible={uploadVisible} />
-
       <Form
         initialValues={{
           title: "",
@@ -242,7 +199,6 @@ function ListingEditScreen() {
           category: null,
           images: [],
         }}
-        // onSubmit={(values) => console.log(location)}
         onSubmit={handleAddItem}
         validationSchema={validationSchema}
       >
@@ -268,7 +224,7 @@ function ListingEditScreen() {
           numberOfColumns={3}
           PickerItemComponent={CategoryPickerItem}
           placeholder="Category"
-          width="50%"
+          width="55%"
         />
         <FormField
           maxLength={255}

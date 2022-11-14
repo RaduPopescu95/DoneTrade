@@ -1,12 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import React from "react";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -128,7 +121,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     marginHorizontal: 40,
     backgroundColor: "#e2e2e2",
-    //flexBasis: '42%',
     width: 90,
     height: 90,
     borderRadius: 60,

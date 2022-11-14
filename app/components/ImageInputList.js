@@ -1,7 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useRef } from "react";
 import ImageInput from "./ImageInput";
-import ScrollViewCommands from "react-native/Libraries/Components/ScrollView/ScrollViewCommands";
 
 export default function ImageInputList({
   imageUris = [],
